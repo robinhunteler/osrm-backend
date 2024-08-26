@@ -16,6 +16,7 @@ struct RouteLeg
     double distance;
     double duration;
     double weight;
+    double energy_consumption;
     std::string summary;
     std::vector<RouteStep> steps;
 };

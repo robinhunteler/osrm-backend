@@ -23,7 +23,13 @@ Route assembleRoute(const std::vector<RouteLeg> &route_legs)
                         0.,
                         [](const double sum, const RouteLeg &leg) { return sum + leg.weight; });
 
-    return Route{distance, duration, weight};
+    auto energy_consumption = 
+        std::accumulate(route_legs.begin(),
+                        route_legs.end(),
+                        0.,
+                        [](const double sum, const RouteLeg &leg) { return sum + leg.energy_consumption; });
+
+    return Route{distance, duration, weight, energy_consumption};
 }
 
 } // namespace osrm::engine::guidance

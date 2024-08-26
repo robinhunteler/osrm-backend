@@ -176,6 +176,7 @@ util::json::Object makeRouteStep(guidance::RouteStep step, util::json::Value geo
     route_step.values.emplace("distance", std::round(step.distance * 10) / 10.);
     route_step.values.emplace("duration", step.duration);
     route_step.values.emplace("weight", step.weight);
+    route_step.values.emplace("energy consumption", step.energy_consumption);
     route_step.values.emplace("name", step.name);
 
     if (!step.ref.empty())
@@ -223,6 +224,7 @@ util::json::Object makeRoute(const guidance::Route &route,
 
     json_route.values.emplace("distance", route.distance);
     json_route.values.emplace("duration", route.duration);
+    json_route.values.emplace("energy_consumption", route.energy_consumption);
     json_route.values.emplace("weight", route.weight);
     json_route.values.emplace("weight_name", weight_name);
     json_route.values.emplace("legs", std::move(legs));
@@ -264,6 +266,7 @@ util::json::Object makeRouteLeg(guidance::RouteLeg leg, util::json::Array steps)
     route_leg.values.emplace("distance", leg.distance);
     route_leg.values.emplace("duration", leg.duration);
     route_leg.values.emplace("weight", leg.weight);
+    route_leg.values.emplace("energy_consumption", leg.energy_consumption);
     route_leg.values.emplace("summary", std::move(leg.summary));
     route_leg.values.emplace("steps", std::move(steps));
     return route_leg;

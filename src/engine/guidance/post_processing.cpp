@@ -295,6 +295,7 @@ void trimShortSegments(std::vector<RouteStep> &steps, LegGeometry &geometry)
             // FIXME this is required to be consistent with the route durations. The initial
             // turn is not actually part of the route, though
             designated_depart.duration += current_depart.duration;
+            designated_depart.energy_consumption += current_depart.energy_consumption;
 
             // update initial turn direction/bearings. Due to the duplicated first coordinate,
             // the initial bearing is invalid

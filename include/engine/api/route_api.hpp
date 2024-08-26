@@ -827,6 +827,14 @@ class RouteAPI : public BaseAPI
                                        [](const guidance::LegGeometry::Annotation &anno)
                                        { return anno.weight; }));
                 }
+                if (requested_annotations & RouteParameters::AnnotationsType::EnergyConsumption)
+                {
+                    annotation.values.emplace(
+                        "energyconsumption",
+                        GetAnnotations(leg_geometry,
+                                       [](const guidance::LegGeometry::Annotation &anno)
+                                       { return anno.distance; }));
+                }
                 if (requested_annotations & RouteParameters::AnnotationsType::Datasources)
                 {
                     annotation.values.emplace(

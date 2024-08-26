@@ -196,6 +196,9 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
                                   [](const double sum, const PathData &data)
                                   { return sum + from_alias<double>(data.weight_until_turn); });
 
+    // Should do somehting with energy_consumption
+    auto energy_consumption = 2 * distance;
+
     //                 s
     //                 |
     // Given a route a---b---c  where there is a right turn at c.
@@ -233,6 +236,7 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
     return RouteLeg{std::round(distance * 10.) / 10.,
                     duration / 10.,
                     weight / facade.GetWeightMultiplier(),
+                    std::round(energy_consumption * 10. / 10.),
                     "",
                     {}};
 }

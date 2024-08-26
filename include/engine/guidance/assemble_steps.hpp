@@ -146,6 +146,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                           from_alias<double>(segment_duration) / 10.,
                                           distance,
                                           from_alias<double>(segment_weight) / weight_multiplier,
+                                          distance * 2, // NEED TO ADJUST THIS
                                           travel_mode,
                                           maneuver,
                                           leg_geometry.FrontIndex(segment_index),
@@ -247,6 +248,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   from_alias<double>(duration) / 10.,
                                   distance,
                                   from_alias<double>(weight) / weight_multiplier,
+                                  2 * distance, // NEED TO ADJUST THIS
                                   target_mode,
                                   maneuver,
                                   leg_geometry.FrontIndex(segment_index),
@@ -293,6 +295,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   from_alias<double>(duration) / 10.,
                                   leg_geometry.segment_distances[segment_index],
                                   from_alias<double>(weight) / weight_multiplier,
+                                  2 * leg_geometry.segment_distances[segment_index], // NEED TO ADJUST
                                   source_mode,
                                   maneuver,
                                   leg_geometry.FrontIndex(segment_index),
@@ -336,6 +339,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                               ZERO_DURATION,
                               ZERO_DISTANCE,
                               ZERO_WEIGHT,
+                              ZERO_DISTANCE, 
                               target_mode,
                               maneuver,
                               leg_geometry.locations.size() - 1,
