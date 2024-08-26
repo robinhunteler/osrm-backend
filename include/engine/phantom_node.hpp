@@ -52,6 +52,8 @@ struct PhantomNode
           forward_distance_offset{0}, reverse_distance_offset{0},
           forward_duration(MAXIMAL_EDGE_DURATION), reverse_duration(MAXIMAL_EDGE_DURATION),
           forward_duration_offset{0}, reverse_duration_offset{0},
+          forward_energy_consumption(INVALID_EDGE_DISTANCE), reverse_energy_consumption(INVALID_EDGE_DISTANCE),
+          forward_energy_consumption_offset{0}, reverse_energy_consumption_offset{0},
           component({INVALID_COMPONENTID, 0}),
           fwd_segment_position(0), is_valid_forward_source{false}, is_valid_forward_target{false},
           is_valid_reverse_source{false}, is_valid_reverse_target{false}, bearing(0)
@@ -105,6 +107,18 @@ struct PhantomNode
         // 0----1----2----3----4  <-- EdgeBasedGraph Node segments
         BOOST_ASSERT(reverse_segment_id.enabled);
         return reverse_distance + reverse_distance_offset;
+    }
+
+    EdgeDistance GetForwardEnergyConsumption() const
+    {
+        BOOST_ASSERT(forward_segment_id.enabled);
+        return forward_energy_consumption + forward_energy_consumption_offset;
+    }
+
+    EdgeDistance GetReverseEnergyConsumption() const
+    {
+        BOOST_ASSERT(reverse_segment_id.enabled);
+        return reverse_energy_consumption + reverse_energy_consumption;
     }
 
     bool IsBidirected() const { return forward_segment_id.enabled && reverse_segment_id.enabled; }
@@ -170,6 +184,10 @@ struct PhantomNode
                          EdgeDuration reverse_duration,
                          EdgeDuration forward_duration_offset,
                          EdgeDuration reverse_duration_offset,
+                         EdgeDistance forward_energy_consumption,
+                         EdgeDistance reverse_energy_consumption,
+                         EdgeDistance forward_energy_consumption_offset,
+                         EdgeDistance reverse_energy_consumption_offset,
                          bool is_valid_forward_source,
                          bool is_valid_forward_target,
                          bool is_valid_reverse_source,
@@ -185,6 +203,8 @@ struct PhantomNode
           reverse_distance_offset{reverse_distance_offset}, forward_duration{forward_duration},
           reverse_duration{reverse_duration}, forward_duration_offset{forward_duration_offset},
           reverse_duration_offset{reverse_duration_offset},
+          reverse_energy_consumption{reverse_energy_consumption}, reverse_energy_consumption_offset{reverse_energy_consumption_offset},
+          forward_energy_consumption{forward_energy_consumption}, forward_energy_consumption_offset{forward_energy_consumption_offset},
           component{component.id, component.is_tiny}, location{location},
           input_location{input_location}, fwd_segment_position{other.fwd_segment_position},
           is_valid_forward_source{is_valid_forward_source},
@@ -208,6 +228,10 @@ struct PhantomNode
     EdgeDuration reverse_duration;
     EdgeDuration forward_duration_offset; // TODO: try to remove -> requires path unpacking changes
     EdgeDuration reverse_duration_offset; // TODO: try to remove -> requires path unpacking changes
+    EdgeDistance forward_energy_consumption;
+    EdgeDistance reverse_energy_consumption;
+    EdgeDistance forward_energy_consumption_offset;
+    EdgeDistance reverse_energy_consumption_offset;
     ComponentID component;
 
     util::Coordinate location; // this is the coordinate of x
@@ -222,7 +246,7 @@ struct PhantomNode
     unsigned short bearing : 12;
 };
 
-static_assert(sizeof(PhantomNode) == 80, "PhantomNode has more padding then expected");
+static_assert(sizeof(PhantomNode) == 96, "PhantomNode has more padding then expected");
 
 using PhantomNodeCandidates = std::vector<PhantomNode>;
 using PhantomCandidateAlternatives = std::pair<PhantomNodeCandidates, PhantomNodeCandidates>;

@@ -31,7 +31,8 @@ struct TableResult FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_COLS = 8,
     VT_DISTANCES = 10,
     VT_DESTINATIONS = 12,
-    VT_FALLBACK_SPEED_CELLS = 14
+    VT_FALLBACK_SPEED_CELLS = 14,
+    VT_ENGERGY_CONSUMPTIONS = 16
   };
   const ::flatbuffers::Vector<float> *durations() const {
     return GetPointer<const ::flatbuffers::Vector<float> *>(VT_DURATIONS);
@@ -83,6 +84,9 @@ struct TableResultBuilder {
   }
   void add_distances(::flatbuffers::Offset<::flatbuffers::Vector<float>> distances) {
     fbb_.AddOffset(TableResult::VT_DISTANCES, distances);
+  }
+  void add_energy_consumptions(::flatbuffers::Offset<::flatbuffers::Vector<float>> energy_consumptions) {
+    fbb_.AddOffset(TableResult::VT_ENGERGY_CONSUMPTIONS, energy_consumptions);
   }
   void add_destinations(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<osrm::engine::api::fbresult::Waypoint>>> destinations) {
     fbb_.AddOffset(TableResult::VT_DESTINATIONS, destinations);

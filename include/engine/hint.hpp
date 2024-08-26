@@ -76,8 +76,8 @@ struct Hint
     static Hint FromBase64(const std::string &base64Hint);
 };
 
-static_assert(sizeof(SegmentHint) == 80 + 4, "Hint is bigger than expected");
-constexpr std::size_t ENCODED_SEGMENT_HINT_SIZE = 112;
+static_assert(sizeof(SegmentHint) == 96 + 4, "Hint is bigger than expected");
+constexpr std::size_t ENCODED_SEGMENT_HINT_SIZE = 136;
 static_assert(ENCODED_SEGMENT_HINT_SIZE / 4 * 3 >= sizeof(SegmentHint),
               "ENCODED_SEGMENT_HINT_SIZE does not match size of SegmentHint");
 

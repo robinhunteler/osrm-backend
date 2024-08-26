@@ -326,6 +326,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 }
             }
             ();
+            auto energy_consumption = distance;
             for (auto shortcut_weight : cell.GetOutWeight(heapNode.node))
             {
                 BOOST_ASSERT(destination != cell.GetDestinationNodes().end());
@@ -351,6 +352,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 if constexpr (IS_MAP_MATCHING)
                 {
                     ++distance;
+                    ++energy_consumption;
                 }
             }
         }
@@ -374,6 +376,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 }
             }
             ();
+            auto energy_consumption = distance;
             for (auto shortcut_weight : cell.GetInWeight(heapNode.node))
             {
                 BOOST_ASSERT(source != cell.GetSourceNodes().end());
@@ -398,6 +401,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 if constexpr (IS_MAP_MATCHING)
                 {
                     ++distance;
+                    ++energy_consumption;
                 }
             }
         }

@@ -453,6 +453,12 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
         bool is_reverse_valid_target = areSegmentsValid(
             reverse_weights.begin(), reverse_weights.end() - data.fwd_segment_position);
 
+        EdgeDistance forward_energy_consumption = forward_distance * 2.0;
+        EdgeDistance reverse_energy_consumption = reverse_distance * 2.0;
+
+        EdgeDistance forward_energy_consumption_offset = forward_distance_offset * 2.0;
+        EdgeDistance reverse_energy_consumption_offset = reverse_distance_offset * 2.0;
+
         auto transformed = PhantomNodeWithDistance{
             PhantomNode{data,
                         component_id,
@@ -468,6 +474,10 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
                         reverse_duration,
                         forward_duration_offset,
                         reverse_duration_offset,
+                        forward_energy_consumption,
+                        reverse_energy_consumption,
+                        forward_energy_consumption_offset,
+                        reverse_energy_consumption_offset,
                         is_forward_valid_source,
                         is_forward_valid_target,
                         is_reverse_valid_source,

@@ -45,7 +45,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  osrm::engine::api::ResultT &response) const
@@ -63,7 +63,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  flatbuffers::FlatBufferBuilder &fb_result) const
@@ -118,14 +118,21 @@ class TableAPI final : public BaseAPI
         flatbuffers::Offset<flatbuffers::Vector<float>> durations;
         if (use_durations)
         {
-            durations = MakeDurationTable(fb_result, tables.first);
+            durations = MakeDurationTable(fb_result, std::get<0>(tables));
         }
 
         bool use_distances = parameters.annotations & TableParameters::AnnotationsType::Distance;
         flatbuffers::Offset<flatbuffers::Vector<float>> distances;
         if (use_distances)
         {
-            distances = MakeDistanceTable(fb_result, tables.second);
+            distances = MakeDistanceTable(fb_result, std::get<1>(tables));
+        }
+
+        bool use_energy_consumptions = parameters.annotations & TableParameters::AnnotationsType::EnergyConsumption;
+        flatbuffers::Offset<flatbuffers::Vector<float>> energy_consumptions;
+        if (use_energy_consumptions)
+        {
+            energy_consumptions = MakeEnergyConsumptionTable(fb_result, std::get<2>(tables));
         }
 
         bool have_speed_cells =
@@ -149,6 +156,10 @@ class TableAPI final : public BaseAPI
         {
             table.add_distances(distances);
         }
+        if (use_energy_consumptions)
+        {
+            table.add_energy_consumptions(energy_consumptions);
+        }
         if (have_speed_cells)
         {
             table.add_fallback_speed_cells(speed_cells);
@@ -166,7 +177,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  util::json::Object &response) const
@@ -212,14 +223,21 @@ class TableAPI final : public BaseAPI
         {
             response.values.emplace(
                 "durations",
-                MakeDurationTable(tables.first, number_of_sources, number_of_destinations));
+                MakeDurationTable(std::get<0>(tables), number_of_sources, number_of_destinations));
         }
 
         if (parameters.annotations & TableParameters::AnnotationsType::Distance)
         {
             response.values.emplace(
                 "distances",
-                MakeDistanceTable(tables.second, number_of_sources, number_of_destinations));
+                MakeDistanceTable(std::get<1>(tables), number_of_sources, number_of_destinations));
+        }
+
+        if (parameters.annotations & TableParameters::AnnotationsType::EnergyConsumption)
+        {
+            response.values.emplace(
+                "energyconsumptions",
+                MakeEnergyConsumptionTable(std::get<2>(tables), number_of_sources, number_of_destinations));
         }
 
         if (parameters.fallback_speed != from_alias<double>(INVALID_FALLBACK_SPEED) &&
@@ -311,6 +329,26 @@ class TableAPI final : public BaseAPI
         return builder.CreateVector(duration_table);
     }
 
+    virtual flatbuffers::Offset<flatbuffers::Vector<float>>
+    MakeEnergyConsumptionTable(flatbuffers::FlatBufferBuilder &builder,
+                      const std::vector<EdgeDistance> &values) const
+    {
+        std::vector<float> duration_table;
+        duration_table.resize(values.size());
+        std::transform(values.begin(),
+                       values.end(),
+                       duration_table.begin(),
+                       [](const EdgeDistance energy_consumption)
+                       {
+                           if (energy_consumption == INVALID_EDGE_DISTANCE)
+                           {
+                               return 0.;
+                           }
+                           return std::round(from_alias<double>(energy_consumption) * 10) / 10.;
+                       });
+        return builder.CreateVector(duration_table);
+    }
+
     virtual flatbuffers::Offset<flatbuffers::Vector<uint32_t>>
     MakeEstimatesTable(flatbuffers::FlatBufferBuilder &builder,
                        const std::vector<TableCellRef> &fallback_speed_cells) const
@@ -387,6 +425,36 @@ class TableAPI final : public BaseAPI
     }
 
     virtual util::json::Array MakeDistanceTable(const std::vector<EdgeDistance> &values,
+                                                std::size_t number_of_rows,
+                                                std::size_t number_of_columns) const
+    {
+        util::json::Array json_table;
+        for (const auto row : util::irange<std::size_t>(0UL, number_of_rows))
+        {
+            util::json::Array json_row;
+            auto row_begin_iterator = values.begin() + (row * number_of_columns);
+            auto row_end_iterator = values.begin() + ((row + 1) * number_of_columns);
+            json_row.values.resize(number_of_columns);
+            std::transform(row_begin_iterator,
+                           row_end_iterator,
+                           json_row.values.begin(),
+                           [](const EdgeDistance distance)
+                           {
+                               if (distance == INVALID_EDGE_DISTANCE)
+                               {
+                                   return util::json::Value(util::json::Null());
+                               }
+                               // round to single decimal place
+                               return util::json::Value(util::json::Number(
+                                   std::round(from_alias<double>(distance) * 10) / 10.));
+                           });
+            json_table.values.push_back(util::json::Value{json_row});
+        }
+        return json_table;
+    }
+
+
+    virtual util::json::Array MakeEnergyConsumptionTable(const std::vector<EdgeDistance> &values,
                                                 std::size_t number_of_rows,
                                                 std::size_t number_of_columns) const
     {

@@ -128,7 +128,8 @@ void insertSourceInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         EdgeWeight{0} - phantom_node.GetForwardWeightPlusOffset(),
                         {phantom_node.forward_segment_id.id,
                          EdgeDuration{0} - phantom_node.GetForwardDuration(),
-                         EdgeDistance{0} - phantom_node.GetForwardDistance()});
+                         EdgeDistance{0} - phantom_node.GetForwardDistance(),
+                         EdgeDistance{0} - phantom_node.GetForwardEnergyConsumption()});
         }
         if (phantom_node.IsValidReverseSource())
         {
@@ -136,7 +137,8 @@ void insertSourceInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         EdgeWeight{0} - phantom_node.GetReverseWeightPlusOffset(),
                         {phantom_node.reverse_segment_id.id,
                          EdgeDuration{0} - phantom_node.GetReverseDuration(),
-                         EdgeDistance{0} - phantom_node.GetReverseDistance()});
+                         EdgeDistance{0} - phantom_node.GetReverseDistance(),
+                         EdgeDistance{0} - phantom_node.GetReverseEnergyConsumption()});
         }
     }
 }
@@ -152,7 +154,8 @@ void insertTargetInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         phantom_node.GetForwardWeightPlusOffset(),
                         {phantom_node.forward_segment_id.id,
                          phantom_node.GetForwardDuration(),
-                         phantom_node.GetForwardDistance()});
+                         phantom_node.GetForwardDistance(),
+                         phantom_node.GetForwardEnergyConsumption()});
         }
         if (phantom_node.IsValidReverseTarget())
         {
@@ -160,7 +163,8 @@ void insertTargetInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         phantom_node.GetReverseWeightPlusOffset(),
                         {phantom_node.reverse_segment_id.id,
                          phantom_node.GetReverseDuration(),
-                         phantom_node.GetReverseDistance()});
+                         phantom_node.GetReverseDistance(),
+                         phantom_node.GetReverseEnergyConsumption()});
         }
     }
 }

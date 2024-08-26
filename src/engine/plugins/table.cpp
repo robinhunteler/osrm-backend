@@ -74,12 +74,13 @@ Status TablePlugin::HandleRequest(const RoutingAlgorithmsInterface &algorithms,
 
     bool request_distance = params.annotations & api::TableParameters::AnnotationsType::Distance;
     bool request_duration = params.annotations & api::TableParameters::AnnotationsType::Duration;
+    bool request_energy_consumptions = params.annotations & api::TableParameters::AnnotationsType::EnergyConsumption;
 
-    auto result_tables_pair = algorithms.ManyToManySearch(
+    auto result_tables_tuple = algorithms.ManyToManySearch(
         snapped_phantoms, params.sources, params.destinations, request_distance);
 
-    if ((request_duration && result_tables_pair.first.empty()) ||
-        (request_distance && result_tables_pair.second.empty()))
+    if ((request_duration && std::get<0>(result_tables_tuple).empty()) ||
+        (request_distance && std::get<1>(result_tables_tuple).empty()))
     {
         return Error("NoTable", "No table found", result);
     }
@@ -95,10 +96,10 @@ Status TablePlugin::HandleRequest(const RoutingAlgorithmsInterface &algorithms,
             for (std::size_t column = 0; column < num_destinations; column++)
             {
                 const auto &table_index = row * num_destinations + column;
-                BOOST_ASSERT(table_index < result_tables_pair.first.size());
+                BOOST_ASSERT(table_index < std::get<0>(result_tables_tuple).size());
                 if (params.fallback_speed != from_alias<double>(INVALID_FALLBACK_SPEED) &&
                     params.fallback_speed > 0 &&
-                    result_tables_pair.first[table_index] == MAXIMAL_EDGE_DURATION)
+                    std::get<0>(result_tables_tuple)[table_index] == MAXIMAL_EDGE_DURATION)
                 {
                     const auto &source =
                         snapped_phantoms[params.sources.empty() ? row : params.sources[row]];
@@ -116,32 +117,32 @@ Status TablePlugin::HandleRequest(const RoutingAlgorithmsInterface &algorithms,
                                   candidatesSnappedLocation(source),
                                   candidatesSnappedLocation(destination));
 
-                    result_tables_pair.first[table_index] =
+                    std::get<0>(result_tables_tuple)[table_index] =
                         to_alias<EdgeDuration>(distance_estimate / params.fallback_speed);
-                    if (!result_tables_pair.second.empty())
+                    if (!std::get<1>(result_tables_tuple).empty())
                     {
-                        result_tables_pair.second[table_index] =
+                        std::get<1>(result_tables_tuple)[table_index] =
                             to_alias<EdgeDistance>(distance_estimate);
                     }
 
                     estimated_pairs.emplace_back(row, column);
                 }
                 if (params.scale_factor > 0 && params.scale_factor != 1 &&
-                    result_tables_pair.first[table_index] != MAXIMAL_EDGE_DURATION &&
-                    result_tables_pair.first[table_index] != EdgeDuration{0})
+                    std::get<0>(result_tables_tuple)[table_index] != MAXIMAL_EDGE_DURATION &&
+                    std::get<0>(result_tables_tuple)[table_index] != EdgeDuration{0})
                 {
                     EdgeDuration diff =
-                        MAXIMAL_EDGE_DURATION / result_tables_pair.first[table_index];
+                        MAXIMAL_EDGE_DURATION / std::get<0>(result_tables_tuple)[table_index];
 
                     if (params.scale_factor >= from_alias<double>(diff))
                     {
-                        result_tables_pair.first[table_index] =
+                        std::get<0>(result_tables_tuple)[table_index] =
                             MAXIMAL_EDGE_DURATION - EdgeDuration{1};
                     }
                     else
                     {
-                        result_tables_pair.first[table_index] = to_alias<EdgeDuration>(
-                            std::lround(from_alias<double>(result_tables_pair.first[table_index]) *
+                        std::get<0>(result_tables_tuple)[table_index] = to_alias<EdgeDuration>(
+                            std::lround(from_alias<double>(std::get<0>(result_tables_tuple)[table_index]) *
                                         params.scale_factor));
                     }
                 }
@@ -150,7 +151,7 @@ Status TablePlugin::HandleRequest(const RoutingAlgorithmsInterface &algorithms,
     }
 
     api::TableAPI table_api{facade, params};
-    table_api.MakeResponse(result_tables_pair, snapped_phantoms, estimated_pairs, result);
+    table_api.MakeResponse(result_tables_tuple, snapped_phantoms, estimated_pairs, result);
 
     return Status::Ok;
 }

@@ -22,6 +22,7 @@ struct NodeBucket
     EdgeWeight weight;
     EdgeDuration duration;
     EdgeDistance distance;
+    EdgeDistance energy_consumption;
 
     NodeBucket(NodeID middle_node,
                NodeID parent_node,
@@ -29,9 +30,10 @@ struct NodeBucket
                unsigned column_index,
                EdgeWeight weight,
                EdgeDuration duration,
-               EdgeDistance distance)
+               EdgeDistance distance,
+               EdgeDistance energy_consumption)
         : middle_node(middle_node), parent_node(parent_node), column_index(column_index),
-          from_clique_arc(from_clique_arc), weight(weight), duration(duration), distance(distance)
+          from_clique_arc(from_clique_arc), weight(weight), duration(duration), distance(distance), energy_consumption(energy_consumption)
     {
     }
 
@@ -40,9 +42,10 @@ struct NodeBucket
                unsigned column_index,
                EdgeWeight weight,
                EdgeDuration duration,
-               EdgeDistance distance)
+               EdgeDistance distance,
+               EdgeDistance energy_consumption)
         : middle_node(middle_node), parent_node(parent_node), column_index(column_index),
-          from_clique_arc(false), weight(weight), duration(duration), distance(distance)
+          from_clique_arc(false), weight(weight), duration(duration), distance(distance), energy_consumption(energy_consumption)
     {
     }
 
@@ -87,7 +90,7 @@ struct NodeBucket
 } // namespace
 
 template <typename Algorithm>
-std::pair<std::vector<EdgeDuration>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
 manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                  const DataFacade<Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,
