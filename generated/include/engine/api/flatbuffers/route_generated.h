@@ -228,7 +228,8 @@ struct Annotation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_NODES = 10,
     VT_WEIGHT = 12,
     VT_SPEED = 14,
-    VT_METADATA = 16
+    VT_METADATA = 16,
+    VT_ENERGY_CONSUMPTION = 18,
   };
   const ::flatbuffers::Vector<uint32_t> *distance() const {
     return GetPointer<const ::flatbuffers::Vector<uint32_t> *>(VT_DISTANCE);
@@ -251,6 +252,9 @@ struct Annotation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const osrm::engine::api::fbresult::Metadata *metadata() const {
     return GetPointer<const osrm::engine::api::fbresult::Metadata *>(VT_METADATA);
   }
+    const ::flatbuffers::Vector<uint32_t> *distance() const {
+    return GetPointer<const ::flatbuffers::Vector<uint32_t> *>(VT_ENERGY_CONSUMPTION);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DISTANCE) &&
@@ -266,6 +270,8 @@ struct Annotation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_SPEED) &&
            verifier.VerifyVector(speed()) &&
            VerifyOffset(verifier, VT_METADATA) &&
+           verifier.VerifyTable(metadata()) &&
+           VerifyOffset(verifier, VT_ENERGY_CONSUMPTION) &&
            verifier.VerifyTable(metadata()) &&
            verifier.EndTable();
   }
@@ -296,6 +302,9 @@ struct AnnotationBuilder {
   void add_metadata(::flatbuffers::Offset<osrm::engine::api::fbresult::Metadata> metadata) {
     fbb_.AddOffset(Annotation::VT_METADATA, metadata);
   }
+  void add_energy_consumption(::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> energy_consumption) {
+    fbb_.AddOffset(Annotation::VT_ENERGY_CONSUMPTION, energy_consumption);
+  }
   explicit AnnotationBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -315,7 +324,9 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotation(
     ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> nodes = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> weight = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<float>> speed = 0,
-    ::flatbuffers::Offset<osrm::engine::api::fbresult::Metadata> metadata = 0) {
+    ::flatbuffers::Offset<osrm::engine::api::fbresult::Metadata> metadata = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> energy_consumption = 0,
+        ) {
   AnnotationBuilder builder_(_fbb);
   builder_.add_metadata(metadata);
   builder_.add_speed(speed);
@@ -324,6 +335,7 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotation(
   builder_.add_datasources(datasources);
   builder_.add_duration(duration);
   builder_.add_distance(distance);
+  builder_.add_energy_consumption(energy_consumption);
   return builder_.Finish();
 }
 
@@ -335,6 +347,7 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotationDirect(
     const std::vector<uint32_t> *nodes = nullptr,
     const std::vector<uint32_t> *weight = nullptr,
     const std::vector<float> *speed = nullptr,
+    const std::vector<uint32_t> *energy_consumption = nullptr,
     ::flatbuffers::Offset<osrm::engine::api::fbresult::Metadata> metadata = 0) {
   auto distance__ = distance ? _fbb.CreateVector<uint32_t>(*distance) : 0;
   auto duration__ = duration ? _fbb.CreateVector<uint32_t>(*duration) : 0;
@@ -342,6 +355,7 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotationDirect(
   auto nodes__ = nodes ? _fbb.CreateVector<uint32_t>(*nodes) : 0;
   auto weight__ = weight ? _fbb.CreateVector<uint32_t>(*weight) : 0;
   auto speed__ = speed ? _fbb.CreateVector<float>(*speed) : 0;
+  auto energy_consumption__ = energy_consumption ? _fbb.CreateVector<uint32_t>(*energy_consumption) : 0;
   return osrm::engine::api::fbresult::CreateAnnotation(
       _fbb,
       distance__,
@@ -350,7 +364,8 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotationDirect(
       nodes__,
       weight__,
       speed__,
-      metadata);
+      metadata,
+      energy_consumption__);
 }
 
 struct StepManeuver FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -751,6 +766,9 @@ struct StepBuilder {
   void add_duration(float duration) {
     fbb_.AddElement<float>(Step::VT_DURATION, duration, 0.0f);
   }
+  void add_energy_consumption(float energy_consumption) {
+    fbb_.AddElement<float>(Step::VT_ENERGY_CONSUMPTION, energy_consumption, 0.0f);
+  }
   void add_polyline(::flatbuffers::Offset<::flatbuffers::String> polyline) {
     fbb_.AddOffset(Step::VT_POLYLINE, polyline);
   }
@@ -956,6 +974,9 @@ struct LegBuilder {
   }
   void add_steps(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<osrm::engine::api::fbresult::Step>>> steps) {
     fbb_.AddOffset(Leg::VT_STEPS, steps);
+  }
+  void add_energy_consumption(double energy_consumption) {
+    fbb_.AddElement<double>(Leg::VT_ENERGY_CONSUMPTION, energy_consumption, 0.0);
   }
   explicit LegBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {

@@ -392,6 +392,7 @@ class RouteAPI : public BaseAPI
             legBuilder.add_distance(leg.distance);
             legBuilder.add_duration(leg.duration);
             legBuilder.add_weight(leg.weight);
+            
             if (!leg.summary.empty())
             {
                 legBuilder.add_summary(summary_string);
