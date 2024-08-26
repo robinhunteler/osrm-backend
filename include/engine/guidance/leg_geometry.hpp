@@ -39,6 +39,7 @@ struct LegGeometry
         // the turn penalty if the segment preceeds a turn
         double duration;
         double weight; // weight value, NOT including the turn weight
+        double energy_consumption;
 
         DatasourceID datasource;
     };
