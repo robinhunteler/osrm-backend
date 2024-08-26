@@ -920,6 +920,11 @@ inline bool parseCommonParameters(const Napi::Object &obj, ParamType &params)
                     params->annotations_type =
                         params->annotations_type | osrm::RouteParameters::AnnotationsType::Distance;
                 }
+                else if (annotations_str == "energyconsumption")
+                {
+                    params->annotations_type =
+                        params->annotations_type | osrm::RouteParameters::AnnotationsType::EnergyConsumption;
+                }
                 else if (annotations_str == "weight")
                 {
                     params->annotations_type =
@@ -1428,6 +1433,11 @@ inline table_parameters_ptr argumentsToTableParameter(const Napi::CallbackInfo &
             {
                 params->annotations =
                     params->annotations | osrm::TableParameters::AnnotationsType::Distance;
+            }
+            else if (annotations_str == "energyconsumption")
+            {
+                params->annotations =
+                    params->annotations | osrm::TableParameters::AnnotationsType::EnergyConsumption;
             }
             else
             {
