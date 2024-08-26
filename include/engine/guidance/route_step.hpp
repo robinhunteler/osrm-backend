@@ -68,6 +68,7 @@ struct RouteStep
     double duration; // duration in seconds
     double distance; // distance in meters
     double weight;   // weight value
+    double energy_consumption; // energy consumption in kWh
     extractor::TravelMode mode;
     StepManeuver maneuver;
     // indices into the locations array stored the LegGeometry
@@ -122,6 +123,7 @@ inline void RouteStep::Invalidate()
     duration = 0;
     distance = 0;
     weight = 0;
+    energy_consumption = 0;
     mode = extractor::TRAVEL_MODE_INACCESSIBLE;
     maneuver = getInvalidStepManeuver();
     geometry_begin = 0;
@@ -139,6 +141,7 @@ inline RouteStep &RouteStep::AddInFront(const RouteStep &preceeding_step)
     duration += preceeding_step.duration;
     distance += preceeding_step.distance;
     weight += preceeding_step.weight;
+    energy_consumption += preceeding_step.energy_consumption;
 
     geometry_begin = preceeding_step.geometry_begin;
     intersections.insert(intersections.begin(),
@@ -156,6 +159,7 @@ inline RouteStep &RouteStep::ElongateBy(const RouteStep &following_step)
     duration += following_step.duration;
     distance += following_step.distance;
     weight += following_step.weight;
+    energy_consumption += following_step.energy_consumption;
 
     geometry_end = following_step.geometry_end;
     intersections.insert(intersections.end(),
