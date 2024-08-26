@@ -477,6 +477,15 @@ class RouteAPI : public BaseAPI
                                                 [](const guidance::LegGeometry::Annotation &anno)
                                                 { return anno.distance; });
         }
+        flatbuffers::Offset<flatbuffers::Vector<uint32_t>> energy_consumption;
+        if (requested_annotations & RouteParameters::AnnotationsType::EnergyConsumption)
+        {
+            energy_consumption = GetAnnotations<uint32_t>(fb_result,
+                                                leg_geometry,
+                                                [](const guidance::LegGeometry::Annotation &anno)
+                                                { return anno.energy_consumption; });
+        }
+
 
         flatbuffers::Offset<flatbuffers::Vector<uint32_t>> weight;
         if (requested_annotations & RouteParameters::AnnotationsType::Weight)
