@@ -252,7 +252,7 @@ struct Annotation FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const osrm::engine::api::fbresult::Metadata *metadata() const {
     return GetPointer<const osrm::engine::api::fbresult::Metadata *>(VT_METADATA);
   }
-    const ::flatbuffers::Vector<uint32_t> *distance() const {
+    const ::flatbuffers::Vector<uint32_t> *energy_consumption() const {
     return GetPointer<const ::flatbuffers::Vector<uint32_t> *>(VT_ENERGY_CONSUMPTION);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
@@ -325,7 +325,7 @@ inline ::flatbuffers::Offset<Annotation> CreateAnnotation(
     ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> weight = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<float>> speed = 0,
     ::flatbuffers::Offset<osrm::engine::api::fbresult::Metadata> metadata = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> energy_consumption = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint32_t>> energy_consumption = 0
         ) {
   AnnotationBuilder builder_(_fbb);
   builder_.add_metadata(metadata);
@@ -671,7 +671,8 @@ struct Step FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_INTERSECTIONS = 28,
     VT_ROTARY_NAME = 30,
     VT_ROTARY_PRONUNCIATION = 32,
-    VT_DRIVING_SIDE = 34
+    VT_DRIVING_SIDE = 34,
+    VT_ENERGY_CONSUMPTION = 36
   };
   float distance() const {
     return GetField<float>(VT_DISTANCE, 0.0f);
@@ -917,7 +918,8 @@ struct Leg FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_WEIGHT = 8,
     VT_SUMMARY = 10,
     VT_ANNOTATIONS = 12,
-    VT_STEPS = 14
+    VT_STEPS = 14,
+    VT_ENERGY_CONSUMPTION = 16
   };
   double distance() const {
     return GetField<double>(VT_DISTANCE, 0.0);
@@ -927,6 +929,9 @@ struct Leg FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   double weight() const {
     return GetField<double>(VT_WEIGHT, 0.0);
+  }
+  double energy_consumption() const {
+    return GetField<double>(VT_ENERGY_CONSUMPTION, 0.0);
   }
   const ::flatbuffers::String *summary() const {
     return GetPointer<const ::flatbuffers::String *>(VT_SUMMARY);
@@ -942,6 +947,7 @@ struct Leg FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<double>(verifier, VT_DISTANCE, 8) &&
            VerifyField<double>(verifier, VT_DURATION, 8) &&
            VerifyField<double>(verifier, VT_WEIGHT, 8) &&
+           VerifyField<double>(verifier, VT_ENERGY_CONSUMPTION, 8) &&
            VerifyOffset(verifier, VT_SUMMARY) &&
            verifier.VerifyString(summary()) &&
            VerifyOffset(verifier, VT_ANNOTATIONS) &&
@@ -1037,7 +1043,8 @@ struct RouteObject FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_CONFIDENCE = 12,
     VT_POLYLINE = 14,
     VT_COORDINATES = 16,
-    VT_LEGS = 18
+    VT_LEGS = 18,
+    VT_ENERGY_CONSUMPTION = 20
   };
   float distance() const {
     return GetField<float>(VT_DISTANCE, 0.0f);
@@ -1092,6 +1099,9 @@ struct RouteObjectBuilder {
   void add_duration(float duration) {
     fbb_.AddElement<float>(RouteObject::VT_DURATION, duration, 0.0f);
   }
+  void add_energy_consumption(float duration) {
+    fbb_.AddElement<float>(RouteObject::VT_ENERGY_CONSUMPTION, duration, 0.0f);
+  }
   void add_weight(float weight) {
     fbb_.AddElement<float>(RouteObject::VT_WEIGHT, weight, 0.0f);
   }
@@ -1125,6 +1135,7 @@ inline ::flatbuffers::Offset<RouteObject> CreateRouteObject(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float distance = 0.0f,
     float duration = 0.0f,
+    float energy_consumption = 0.0f,
     float weight = 0.0f,
     ::flatbuffers::Offset<::flatbuffers::String> weight_name = 0,
     float confidence = 0.0f,
@@ -1140,6 +1151,7 @@ inline ::flatbuffers::Offset<RouteObject> CreateRouteObject(
   builder_.add_weight(weight);
   builder_.add_duration(duration);
   builder_.add_distance(distance);
+  builder_.add_energy_consumption(energy_consumption);
   return builder_.Finish();
 }
 
@@ -1147,6 +1159,7 @@ inline ::flatbuffers::Offset<RouteObject> CreateRouteObjectDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float distance = 0.0f,
     float duration = 0.0f,
+    float energy_consumption = 0.0f,
     float weight = 0.0f,
     const char *weight_name = nullptr,
     float confidence = 0.0f,
@@ -1160,6 +1173,7 @@ inline ::flatbuffers::Offset<RouteObject> CreateRouteObjectDirect(
   return osrm::engine::api::fbresult::CreateRouteObject(
       _fbb,
       distance,
+      energy_consumption,
       duration,
       weight,
       weight_name__,

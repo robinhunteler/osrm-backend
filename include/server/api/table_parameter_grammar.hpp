@@ -72,8 +72,7 @@ struct TableParametersGrammar : public BaseParametersGrammar<Iterator, Signature
     {
         using AnnotationsType = engine::api::TableParameters::AnnotationsType;
 
-        annotations.add("duration", AnnotationsType::Duration)("distance",
-                                                               AnnotationsType::Distance);
+        annotations.add("duration", AnnotationsType::Duration)("distance", AnnotationsType::Distance)("energyconsumption", AnnotationsType::EnergyConsumption);
 
         annotations_list = annotations[qi::_val |= qi::_1] % ',';
 

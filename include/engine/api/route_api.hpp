@@ -392,6 +392,7 @@ class RouteAPI : public BaseAPI
             legBuilder.add_distance(leg.distance);
             legBuilder.add_duration(leg.duration);
             legBuilder.add_weight(leg.weight);
+            legBuilder.add_energy_consumption(leg.energy_consumption);
             
             if (!leg.summary.empty())
             {
@@ -422,6 +423,7 @@ class RouteAPI : public BaseAPI
         fbresult::RouteObjectBuilder routeObject(fb_result);
         routeObject.add_distance(route.distance);
         routeObject.add_duration(route.duration);
+        routeObject.add_energy_consumption(route.energy_consumption);
         routeObject.add_weight(route.weight);
         routeObject.add_weight_name(weight_name_string);
         routeObject.add_legs(legs_vector);

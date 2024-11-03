@@ -74,13 +74,14 @@ Status TablePlugin::HandleRequest(const RoutingAlgorithmsInterface &algorithms,
 
     bool request_distance = params.annotations & api::TableParameters::AnnotationsType::Distance;
     bool request_duration = params.annotations & api::TableParameters::AnnotationsType::Duration;
-    bool request_energy_consumptions = params.annotations & api::TableParameters::AnnotationsType::EnergyConsumption;
+    bool request_energy_consumption = params.annotations & api::TableParameters::AnnotationsType::EnergyConsumption;
 
     auto result_tables_tuple = algorithms.ManyToManySearch(
         snapped_phantoms, params.sources, params.destinations, request_distance);
 
     if ((request_duration && std::get<0>(result_tables_tuple).empty()) ||
-        (request_distance && std::get<1>(result_tables_tuple).empty()))
+        (request_distance && std::get<1>(result_tables_tuple).empty()) ||
+        (request_energy_consumption && std::get<2>(result_tables_tuple).empty()))
     {
         return Error("NoTable", "No table found", result);
     }
