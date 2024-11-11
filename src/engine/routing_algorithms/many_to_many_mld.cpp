@@ -59,7 +59,6 @@ void relaxBorderEdges(const DataFacade<mld::Algorithm> &facade,
             const auto node_weight = facade.GetNodeWeight(node_id);
             const auto node_duration = facade.GetNodeDuration(node_id);
             const auto node_distance = facade.GetNodeDistance(node_id);
-            // TODO Mathijs: Add energy consumption logic here.
             const auto node_energy_consumption = facade.GetNodeEnergyConsumption(node_id);
             const auto turn_weight =
                 node_weight + alias_cast<EdgeWeight>(facade.GetWeightPenaltyForEdgeID(turn_id));
@@ -71,7 +70,6 @@ void relaxBorderEdges(const DataFacade<mld::Algorithm> &facade,
             const auto to_weight = weight + turn_weight;
             const auto to_duration = duration + turn_duration;
             const auto to_distance = distance + node_distance;
-            // TODO Mathijs: Add energy consumption logic here.
             const auto to_energy_consumption = energy_consumption + node_energy_consumption;
 
             // New Node discovered -> Add to Heap + Node Info Storage
@@ -137,7 +135,6 @@ void relaxOutgoingEdges(
                     const auto to_weight = heapNode.weight + shortcut_weight;
                     const auto to_duration = heapNode.data.duration + shortcut_durations.front();
                     const auto to_distance = heapNode.data.distance + shortcut_distances.front();
-                    // TODO Mathijs: Add energy consumption logic here.
                     const auto to_energy_consumption = heapNode.data.energy_consumption + shortcut_energy_consumptions.front();
                     const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
                     if (!toHeapNode)
@@ -168,7 +165,6 @@ void relaxOutgoingEdges(
             auto source = cell.GetSourceNodes().begin();
             auto shortcut_durations = cell.GetInDuration(heapNode.node);
             auto shortcut_distances = cell.GetInDistance(heapNode.node);
-            // TODO MATHIJS: Alter logic?
             auto shortcut_energy_consumptions = cell.GetInEnergyConsumption(heapNode.node);
             for (auto shortcut_weight : cell.GetInWeight(heapNode.node))
             {
@@ -182,7 +178,6 @@ void relaxOutgoingEdges(
                     const auto to_weight = heapNode.weight + shortcut_weight;
                     const auto to_duration = heapNode.data.duration + shortcut_durations.front();
                     const auto to_distance = heapNode.data.distance + shortcut_distances.front();
-                    // TODO Mathijs: Add energy consumption logic here.
                     const auto to_energy_consumption = heapNode.data.energy_consumption + shortcut_energy_consumptions.front();
                     const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
                     if (!toHeapNode)

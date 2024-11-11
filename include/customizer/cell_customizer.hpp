@@ -177,7 +177,6 @@ class CellCustomizer
                 auto subcell_destination = subcell.GetDestinationNodes().begin();
                 auto subcell_duration = subcell.GetOutDuration(node).begin();
                 auto subcell_distance = subcell.GetOutDistance(node).begin();
-                // TODO Mathijs: Add energy consumption logic here.
                 auto subcell_energy_consumption = subcell.GetOutEnergyConsumption(node).begin();
                 for (auto subcell_weight : subcell.GetOutWeight(node))
                 {
@@ -192,7 +191,7 @@ class CellCustomizer
                         const EdgeWeight to_weight = weight + subcell_weight;
                         const EdgeDuration to_duration = duration + *subcell_duration;
                         const EdgeDistance to_distance = distance + *subcell_distance;
-                        const EdgeEnergyConsumption to_energy_consumption = energy_consumption + *subcell_energy_consumption * 2.0;
+                        const EdgeEnergyConsumption to_energy_consumption = energy_consumption + *subcell_energy_consumption;
                         if (!heap.WasInserted(to))
                         {
                             heap.Insert(to, to_weight, {true, to_duration, to_distance, to_energy_consumption});
@@ -231,7 +230,6 @@ class CellCustomizer
                 const EdgeWeight to_weight = weight + data.weight;
                 const EdgeDuration to_duration = duration + to_alias<EdgeDuration>(data.duration);
                 const EdgeDistance to_distance = distance + data.distance;
-                // TODO Mathijs: Add energy consumption logic here.
                 const EdgeEnergyConsumption to_energy_consumption = energy_consumption + data.energy_consumption;
                 if (!heap.WasInserted(to))
                 {

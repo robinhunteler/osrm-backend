@@ -62,7 +62,6 @@ void relaxOutgoingEdges(
 
             const auto edge_duration = data.duration;
             const auto edge_distance = data.distance;
-            // TODO Mathijs: Add energy consumption logic here.
             const auto edge_energy_consumption = data.energy_consumption;
 
             BOOST_ASSERT_MSG(edge_weight > EdgeWeight{0}, "edge_weight invalid");
@@ -129,7 +128,6 @@ void forwardRoutingStep(const DataFacade<Algorithm> &facade,
             distances_table.empty() ? nulldistance
                                     : distances_table[row_index * number_of_targets + column_index];
 
-        // TODO Mathijs: Add energy consumption logic here. Change the distance type.
         auto &current_energy_consumption =
             energy_consumptions_table.empty() ? nullenergyconsumption
                                     : energy_consumptions_table[row_index * number_of_targets + column_index];

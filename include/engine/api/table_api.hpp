@@ -340,7 +340,6 @@ class TableAPI final : public BaseAPI
                        duration_table.begin(),
                        [](const EdgeEnergyConsumption energy_consumption)
                        {
-                            // TODO Mathijs: Add energy consumption logic here.
                            if (energy_consumption == INVALID_EDGE_ENERGY_CONSUMPTION)
                            {
                                return 0.;
