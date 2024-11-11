@@ -38,6 +38,7 @@ void relaxBorderEdges(const DataFacade<mld::Algorithm> &facade,
                       const EdgeWeight weight,
                       const EdgeDuration duration,
                       const EdgeDistance distance,
+                      const EdgeEnergyConsumption energy_consumption,
                       typename SearchEngineData<mld::Algorithm>::ManyToManyQueryHeap &query_heap,
                       LevelID level)
 {
@@ -58,7 +59,8 @@ void relaxBorderEdges(const DataFacade<mld::Algorithm> &facade,
             const auto node_weight = facade.GetNodeWeight(node_id);
             const auto node_duration = facade.GetNodeDuration(node_id);
             const auto node_distance = facade.GetNodeDistance(node_id);
-            const auto node_energy_consumption = facade.GetNodeDistance(node_id) + facade.GetNodeDistance(node_id);
+            // TODO Mathijs: Add energy consumption logic here.
+            const auto node_energy_consumption = facade.GetNodeEnergyConsumption(node_id);
             const auto turn_weight =
                 node_weight + alias_cast<EdgeWeight>(facade.GetWeightPenaltyForEdgeID(turn_id));
             const auto turn_duration =
@@ -69,7 +71,8 @@ void relaxBorderEdges(const DataFacade<mld::Algorithm> &facade,
             const auto to_weight = weight + turn_weight;
             const auto to_duration = duration + turn_duration;
             const auto to_distance = distance + node_distance;
-            const auto to_energy_consumption = distance + node_energy_consumption;
+            // TODO Mathijs: Add energy consumption logic here.
+            const auto to_energy_consumption = energy_consumption + node_energy_consumption;
 
             // New Node discovered -> Add to Heap + Node Info Storage
             const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
@@ -120,11 +123,13 @@ void relaxOutgoingEdges(
             auto destination = cell.GetDestinationNodes().begin();
             auto shortcut_durations = cell.GetOutDuration(heapNode.node);
             auto shortcut_distances = cell.GetOutDistance(heapNode.node);
+            auto shortcut_energy_consumptions = cell.GetOutEnergyConsumption(heapNode.node);
             for (auto shortcut_weight : cell.GetOutWeight(heapNode.node))
             {
                 BOOST_ASSERT(destination != cell.GetDestinationNodes().end());
                 BOOST_ASSERT(!shortcut_durations.empty());
                 BOOST_ASSERT(!shortcut_distances.empty());
+                BOOST_ASSERT(!shortcut_energy_consumptions.empty());
                 const NodeID to = *destination;
 
                 if (shortcut_weight != INVALID_EDGE_WEIGHT && heapNode.node != to)
@@ -132,7 +137,8 @@ void relaxOutgoingEdges(
                     const auto to_weight = heapNode.weight + shortcut_weight;
                     const auto to_duration = heapNode.data.duration + shortcut_durations.front();
                     const auto to_distance = heapNode.data.distance + shortcut_distances.front();
-                    const auto to_energy_consumption = to_distance + to_distance;
+                    // TODO Mathijs: Add energy consumption logic here.
+                    const auto to_energy_consumption = heapNode.data.energy_consumption + shortcut_energy_consumptions.front();
                     const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
                     if (!toHeapNode)
                     {
@@ -162,6 +168,8 @@ void relaxOutgoingEdges(
             auto source = cell.GetSourceNodes().begin();
             auto shortcut_durations = cell.GetInDuration(heapNode.node);
             auto shortcut_distances = cell.GetInDistance(heapNode.node);
+            // TODO MATHIJS: Alter logic?
+            auto shortcut_energy_consumptions = cell.GetInEnergyConsumption(heapNode.node);
             for (auto shortcut_weight : cell.GetInWeight(heapNode.node))
             {
                 BOOST_ASSERT(source != cell.GetSourceNodes().end());
@@ -174,7 +182,8 @@ void relaxOutgoingEdges(
                     const auto to_weight = heapNode.weight + shortcut_weight;
                     const auto to_duration = heapNode.data.duration + shortcut_durations.front();
                     const auto to_distance = heapNode.data.distance + shortcut_distances.front();
-                    const auto to_energy_consumption = heapNode.data.energy_consumption + shortcut_distances.front() + shortcut_distances.front();
+                    // TODO Mathijs: Add energy consumption logic here.
+                    const auto to_energy_consumption = heapNode.data.energy_consumption + shortcut_energy_consumptions.front();
                     const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
                     if (!toHeapNode)
                     {
@@ -206,6 +215,7 @@ void relaxOutgoingEdges(
                                 heapNode.weight,
                                 heapNode.data.duration,
                                 heapNode.data.distance,
+                                heapNode.data.energy_consumption,
                                 query_heap,
                                 level);
 }
@@ -214,7 +224,7 @@ void relaxOutgoingEdges(
 // Unidirectional multi-layer Dijkstra search for 1-to-N and N-to-1 matrices
 //
 template <bool DIRECTION>
-std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
 oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                 const DataFacade<Algorithm> &facade,
                 const std::vector<PhantomNodeCandidates> &candidates_list,
@@ -226,8 +236,8 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
     std::vector<EdgeDuration> durations_table(target_indices.size(), MAXIMAL_EDGE_DURATION);
     std::vector<EdgeDistance> distances_table(calculate_distance ? target_indices.size() : 0,
                                               MAXIMAL_EDGE_DISTANCE);
-    std::vector<EdgeDistance> energy_consumptions_table(calculate_distance ? target_indices.size() : 0,
-                                              MAXIMAL_EDGE_DISTANCE);
+    std::vector<EdgeEnergyConsumption> energy_consumptions_table(calculate_distance ? target_indices.size() : 0,
+                                              MAXIMAL_EDGE_ENERGY_CONSUMPTION);
 
     // Collect destination (source) nodes into a map
     std::unordered_multimap<NodeID, std::tuple<std::size_t, EdgeWeight, EdgeDuration, EdgeDistance>>
@@ -328,7 +338,7 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                            EdgeWeight initial_weight,
                            EdgeDuration initial_duration,
                            EdgeDistance initial_distance,
-                           EdgeDistance initial_energy_consumption)
+                           EdgeEnergyConsumption initial_energy_consumption)
     {
         if (target_nodes_index.contains(node))
         {
@@ -338,11 +348,11 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
             // Therefore, we manually run first step of search without marking node as visited.
             update_values(node, initial_weight, initial_duration, initial_distance);
             relaxBorderEdges<DIRECTION>(
-                facade, node, initial_weight, initial_duration, initial_distance, query_heap, 0);
+                facade, node, initial_weight, initial_duration, initial_distance, initial_energy_consumption, query_heap, 0);
         }
         else
         {
-            query_heap.Insert(node, initial_weight, {node, initial_duration, initial_distance, initial_distance +  initial_distance});
+            query_heap.Insert(node, initial_weight, {node, initial_duration, initial_distance, initial_energy_consumption});
         }
     };
 
@@ -359,7 +369,7 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                                 EdgeWeight{0} - phantom_node.GetForwardWeightPlusOffset(),
                                 EdgeDuration{0} - phantom_node.GetForwardDuration(),
                                 EdgeDistance{0} - phantom_node.GetForwardDistance(),
-                                EdgeDistance{0} - phantom_node.GetForwardEnergyConsumption());
+                                EdgeEnergyConsumption{0} - phantom_node.GetForwardEnergyConsumption());
                 }
 
                 if (phantom_node.IsValidReverseSource())
@@ -368,7 +378,7 @@ oneToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                                 EdgeWeight{0} - phantom_node.GetReverseWeightPlusOffset(),
                                 EdgeDuration{0} - phantom_node.GetReverseDuration(),
                                 EdgeDistance{0} - phantom_node.GetReverseDistance(),
-                                EdgeDistance{0} - phantom_node.GetReverseEnergyConsumption());
+                                EdgeEnergyConsumption{0} - phantom_node.GetReverseEnergyConsumption());
                 }
             }
             else if (DIRECTION == REVERSE_DIRECTION)
@@ -425,7 +435,7 @@ void forwardRoutingStep(const DataFacade<Algorithm> &facade,
                         std::vector<EdgeWeight> &weights_table,
                         std::vector<EdgeDuration> &durations_table,
                         std::vector<EdgeDistance> &distances_table,
-                        std::vector<EdgeDistance> &energy_consumptions_table,
+                        std::vector<EdgeEnergyConsumption> &energy_consumptions_table,
                         std::vector<NodeID> &middle_nodes_table,
                         const PhantomNodeCandidates &candidates)
 {
@@ -543,7 +553,7 @@ void retrievePackedPathFromSearchSpace(NodeID middle_node_id,
 }
 
 template <bool DIRECTION>
-std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
 manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
                  const DataFacade<Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,
@@ -559,8 +569,8 @@ manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
     std::vector<EdgeDuration> durations_table(number_of_entries, MAXIMAL_EDGE_DURATION);
     std::vector<EdgeDistance> distances_table(calculate_distance ? number_of_entries : 0,
                                               INVALID_EDGE_DISTANCE);
-    std::vector<EdgeDistance> energy_consumptions_table(calculate_distance ? number_of_entries : 0,
-                                              INVALID_EDGE_DISTANCE);
+    std::vector<EdgeEnergyConsumption> energy_consumptions_table(calculate_distance ? number_of_entries : 0,
+                                              INVALID_EDGE_ENERGY_CONSUMPTION);
     std::vector<NodeID> middle_nodes_table(number_of_entries, SPECIAL_NODEID);
 
     std::vector<NodeBucket> search_space_with_buckets;
@@ -644,7 +654,7 @@ manyToManySearch(SearchEngineData<Algorithm> &engine_working_data,
 //   then search is performed on a reversed graph with phantom nodes with flipped roles and
 //   returning a transposed matrix.
 template <>
-std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
 manyToManySearch(SearchEngineData<mld::Algorithm> &engine_working_data,
                  const DataFacade<mld::Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,

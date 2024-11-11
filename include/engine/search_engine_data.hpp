@@ -26,8 +26,8 @@ struct ManyToManyHeapData : HeapData
 {
     EdgeDuration duration;
     EdgeDistance distance;
-    EdgeDistance energy_consumption;
-    ManyToManyHeapData(NodeID p, EdgeDuration duration, EdgeDistance distance, EdgeDistance energy_consumption)
+    EdgeEnergyConsumption energy_consumption;
+    ManyToManyHeapData(NodeID p, EdgeDuration duration, EdgeDistance distance, EdgeEnergyConsumption energy_consumption)
         : HeapData(p), duration(duration), distance(distance), energy_consumption(energy_consumption)
     {
     }
@@ -94,8 +94,8 @@ struct ManyToManyMultiLayerDijkstraHeapData : MultiLayerDijkstraHeapData
 {
     EdgeDuration duration;
     EdgeDistance distance;
-    EdgeDistance energy_consumption;
-    ManyToManyMultiLayerDijkstraHeapData(NodeID p, EdgeDuration duration, EdgeDistance distance, EdgeDistance energy_consumption)
+    EdgeEnergyConsumption energy_consumption;
+    ManyToManyMultiLayerDijkstraHeapData(NodeID p, EdgeDuration duration, EdgeDistance distance, EdgeEnergyConsumption energy_consumption)
         : MultiLayerDijkstraHeapData(p), duration(duration), distance(distance), energy_consumption(energy_consumption)
     {
     }
@@ -103,7 +103,7 @@ struct ManyToManyMultiLayerDijkstraHeapData : MultiLayerDijkstraHeapData
                                          bool from,
                                          EdgeDuration duration,
                                          EdgeDistance distance,
-                                         EdgeDistance energy_consumption)
+                                         EdgeEnergyConsumption energy_consumption)
         : MultiLayerDijkstraHeapData(p, from), duration(duration), distance(distance), energy_consumption(energy_consumption)
     {
     }

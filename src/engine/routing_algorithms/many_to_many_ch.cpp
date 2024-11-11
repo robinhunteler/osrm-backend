@@ -62,14 +62,14 @@ void relaxOutgoingEdges(
 
             const auto edge_duration = data.duration;
             const auto edge_distance = data.distance;
-            // ADJUST THIS
-            const auto edge_energy_consumption = data.distance + data.distance;
+            // TODO Mathijs: Add energy consumption logic here.
+            const auto edge_energy_consumption = data.energy_consumption;
 
             BOOST_ASSERT_MSG(edge_weight > EdgeWeight{0}, "edge_weight invalid");
             const auto to_weight = heapNode.weight + edge_weight;
             const auto to_duration = heapNode.data.duration + to_alias<EdgeDuration>(edge_duration);
             const auto to_distance = heapNode.data.distance + edge_distance;
-            const auto to_energy_consumption = heapNode.data.energy_consumption + edge_energy_consumption;
+            const auto to_energy_consumption = heapNode.data.energy_consumption + to_alias<EdgeEnergyConsumption>(edge_energy_consumption);
 
             const auto toHeapNode = query_heap.GetHeapNodeIfWasInserted(to);
             // New Node discovered -> Add to Heap + Node Info Storage
@@ -97,7 +97,7 @@ void forwardRoutingStep(const DataFacade<Algorithm> &facade,
                         std::vector<EdgeWeight> &weights_table,
                         std::vector<EdgeDuration> &durations_table,
                         std::vector<EdgeDistance> &distances_table,
-                        std::vector<EdgeDistance> &energy_consumptions_table,
+                        std::vector<EdgeEnergyConsumption> &energy_consumptions_table,
                         std::vector<NodeID> &middle_nodes_table,
                         const PhantomNodeCandidates &candidates)
 {
@@ -122,14 +122,16 @@ void forwardRoutingStep(const DataFacade<Algorithm> &facade,
         auto &current_weight = weights_table[row_index * number_of_targets + column_index];
 
         EdgeDistance nulldistance = {0};
+        EdgeEnergyConsumption nullenergyconsumption = {0};
 
         auto &current_duration = durations_table[row_index * number_of_targets + column_index];
         auto &current_distance =
             distances_table.empty() ? nulldistance
                                     : distances_table[row_index * number_of_targets + column_index];
 
+        // TODO Mathijs: Add energy consumption logic here. Change the distance type.
         auto &current_energy_consumption =
-            energy_consumptions_table.empty() ? nulldistance
+            energy_consumptions_table.empty() ? nullenergyconsumption
                                     : energy_consumptions_table[row_index * number_of_targets + column_index];
 
         // Check if new weight is better
@@ -187,7 +189,7 @@ void backwardRoutingStep(const DataFacade<Algorithm> &facade,
 } // namespace ch
 
 template <>
-std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
 manyToManySearch(SearchEngineData<ch::Algorithm> &engine_working_data,
                  const DataFacade<ch::Algorithm> &facade,
                  const std::vector<PhantomNodeCandidates> &candidates_list,
@@ -203,8 +205,9 @@ manyToManySearch(SearchEngineData<ch::Algorithm> &engine_working_data,
     std::vector<EdgeDuration> durations_table(number_of_entries, MAXIMAL_EDGE_DURATION);
     std::vector<EdgeDistance> distances_table(calculate_distance ? number_of_entries : 0,
                                               MAXIMAL_EDGE_DISTANCE);
-    std::vector<EdgeDistance> energy_consumptions_table(calculate_distance ? number_of_entries : 0,
-                                              MAXIMAL_EDGE_DISTANCE);
+    // TODO MATHIJS: Should make separate bool for calculating energy consumption.
+    std::vector<EdgeEnergyConsumption> energy_consumptions_table(calculate_distance ? number_of_entries : 0,
+                                              MAXIMAL_EDGE_ENERGY_CONSUMPTION);
     std::vector<NodeID> middle_nodes_table(number_of_entries, SPECIAL_NODEID);
 
     std::vector<NodeBucket> search_space_with_buckets;

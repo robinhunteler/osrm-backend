@@ -30,6 +30,7 @@ class Updater
         std::vector<EdgeWeight> &node_weights,
         std::vector<EdgeDuration> &node_durations, // TODO: remove when optional
         std::vector<EdgeDistance> &node_distances, // TODO: remove when optional
+        std::vector<EdgeEnergyConsumption> &node_energy_consumptions, // TODO: remove when optional
         std::uint32_t &connectivity_checksum) const;
 
   private:

@@ -326,6 +326,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 }
             }
             ();
+            // TODO Mathijs: Add energy consumption logic here.
             auto energy_consumption = distance;
             for (auto shortcut_weight : cell.GetOutWeight(heapNode.node))
             {
@@ -376,6 +377,7 @@ void relaxOutgoingEdges(const DataFacade<Algorithm> &facade,
                 }
             }
             ();
+            // TODO Mathijs: Add energy consumption logic here.
             auto energy_consumption = distance;
             for (auto shortcut_weight : cell.GetInWeight(heapNode.node))
             {

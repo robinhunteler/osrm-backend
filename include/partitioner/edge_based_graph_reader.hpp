@@ -42,6 +42,7 @@ splitBidirectionalEdges(const std::vector<extractor::EdgeBasedEdge> &edges)
                               std::max(edge.data.weight, {1}),
                               to_alias<EdgeDuration>(edge.data.duration),
                               edge.data.distance,
+                              edge.data.energy_consumption,
                               edge.data.forward,
                               edge.data.backward);
 
@@ -51,6 +52,7 @@ splitBidirectionalEdges(const std::vector<extractor::EdgeBasedEdge> &edges)
                               std::max(edge.data.weight, {1}),
                               to_alias<EdgeDuration>(edge.data.duration),
                               edge.data.distance,
+                              edge.data.energy_consumption,
                               edge.data.backward,
                               edge.data.forward);
     }

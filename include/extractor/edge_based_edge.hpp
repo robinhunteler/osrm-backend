@@ -14,7 +14,7 @@ struct EdgeBasedEdge
     struct EdgeData
     {
         EdgeData()
-            : turn_id(0), weight{0}, distance{0}, duration(0), forward(false), backward(false)
+            : turn_id(0), weight{0}, distance{0}, duration(0), energy_consumption{0}, forward(false), backward(false)
         {
         }
 
@@ -22,16 +22,18 @@ struct EdgeBasedEdge
                  const EdgeWeight weight,
                  const EdgeDistance distance,
                  const EdgeDuration duration,
+                 const EdgeEnergyConsumption energy_consumption,
                  const bool forward,
                  const bool backward)
             : turn_id(turn_id), weight(weight), distance(distance), duration(duration),
-              forward(forward), backward(backward)
+              energy_consumption(energy_consumption), forward(forward), backward(backward)
         {
         }
 
         NodeID turn_id; // ID of the edge based node (node based edge)
         EdgeWeight weight;
         EdgeDistance distance;
+        EdgeEnergyConsumption energy_consumption;
         EdgeDuration::value_type duration : 30;
         std::uint32_t forward : 1;
         std::uint32_t backward : 1;
@@ -47,6 +49,7 @@ struct EdgeBasedEdge
                   const EdgeWeight weight,
                   const EdgeDuration duration,
                   const EdgeDistance distance,
+                  const EdgeEnergyConsumption energy_consumption,
                   const bool forward,
                   const bool backward);
     EdgeBasedEdge(const NodeID source, const NodeID target, const EdgeBasedEdge::EdgeData &data);
@@ -57,7 +60,7 @@ struct EdgeBasedEdge
     NodeID target;
     EdgeData data;
 };
-static_assert(sizeof(extractor::EdgeBasedEdge) == 24,
+static_assert(sizeof(extractor::EdgeBasedEdge) == 28,
               "Size of extractor::EdgeBasedEdge type is "
               "bigger than expected. This will influence "
               "memory consumption.");
@@ -68,13 +71,14 @@ inline EdgeBasedEdge::EdgeBasedEdge() : source(0), target(0) {}
 
 inline EdgeBasedEdge::EdgeBasedEdge(const NodeID source,
                                     const NodeID target,
-                                    const NodeID turn_id,
+                                    const NodeID edge_id,
                                     const EdgeWeight weight,
                                     const EdgeDuration duration,
                                     const EdgeDistance distance,
+                                    const EdgeEnergyConsumption energy_consumption,
                                     const bool forward,
                                     const bool backward)
-    : source(source), target(target), data{turn_id, weight, distance, duration, forward, backward}
+    : source(source), target(target), data{edge_id, weight, distance, duration, energy_consumption, forward, backward}
 {
 }
 

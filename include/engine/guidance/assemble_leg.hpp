@@ -196,8 +196,8 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
                                   [](const double sum, const PathData &data)
                                   { return sum + from_alias<double>(data.weight_until_turn); });
 
-    // Should do somehting with energy_consumption
-    auto energy_consumption = 2 * distance;
+    // TODO Mathijs: Add energy consumption logic here.
+    auto energy_consumption = 0.0;
 
     //                 s
     //                 |

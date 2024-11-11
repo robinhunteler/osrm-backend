@@ -19,7 +19,7 @@ struct NodeBasedEdgeData
 {
     NodeBasedEdgeData()
         : weight(INVALID_EDGE_WEIGHT), duration(INVALID_EDGE_DURATION),
-          distance(INVALID_EDGE_DISTANCE), geometry_id({0, false}), reversed(false),
+          distance(INVALID_EDGE_DISTANCE), energy_consumption(INVALID_EDGE_ENERGY_CONSUMPTION), geometry_id({0, false}), reversed(false),
           annotation_data(-1)
     {
     }
@@ -27,6 +27,7 @@ struct NodeBasedEdgeData
     NodeBasedEdgeData(EdgeWeight weight,
                       EdgeDuration duration,
                       EdgeDistance distance,
+                      EdgeEnergyConsumption energy_consumption,
                       GeometryID geometry_id,
                       bool reversed,
                       extractor::NodeBasedEdgeClassification flags,
@@ -39,6 +40,7 @@ struct NodeBasedEdgeData
     EdgeWeight weight;
     EdgeDuration duration;
     EdgeDistance distance;
+    EdgeEnergyConsumption energy_consumption;
     GeometryID geometry_id;
     bool reversed : 1;
     extractor::NodeBasedEdgeClassification flags;
@@ -83,12 +85,14 @@ NodeBasedDynamicGraphFromEdges(NodeID number_of_nodes,
             output_edge.data.weight = input_edge.weight;
             output_edge.data.duration = input_edge.duration;
             output_edge.data.distance = input_edge.distance;
+            output_edge.data.energy_consumption = input_edge.energy_consumption;
             output_edge.data.flags = input_edge.flags;
             output_edge.data.annotation_data = input_edge.annotation_data;
 
             BOOST_ASSERT(output_edge.data.weight > EdgeWeight{0});
             BOOST_ASSERT(output_edge.data.duration > EdgeDuration{0});
             BOOST_ASSERT(output_edge.data.distance >= EdgeDistance{0});
+            BOOST_ASSERT(output_edge.data.energy_consumption > EdgeEnergyConsumption{0});
         });
 
     tbb::parallel_sort(edges_list.begin(), edges_list.end());

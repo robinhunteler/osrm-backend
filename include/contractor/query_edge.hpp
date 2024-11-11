@@ -16,7 +16,7 @@ struct QueryEdge
     {
         explicit EdgeData()
             : turn_id(0), shortcut(false), weight{0}, duration(0), forward(false),
-              backward(false), distance{0}
+              backward(false), distance{0}, energy_consumption{0}
         {
         }
 
@@ -25,6 +25,7 @@ struct QueryEdge
                  const EdgeWeight weight,
                  const EdgeDuration duration,
                  const EdgeDistance distance,
+                 const EdgeEnergyConsumption energy_consumption,
                  const bool forward,
                  const bool backward)
             : turn_id(turn_id), shortcut(shortcut), weight(weight), duration(duration),
@@ -41,6 +42,7 @@ struct QueryEdge
             forward = other.forward;
             backward = other.backward;
             distance = other.distance;
+            energy_consumption = other.energy_consumption;
         }
         // this ID is either the middle node of the shortcut, or the ID of the edge based node (node
         // based edge) storing the appropriate data. If `shortcut` is set to true, we get the middle
@@ -52,6 +54,7 @@ struct QueryEdge
         std::uint32_t forward : 1;
         std::uint32_t backward : 1;
         EdgeDistance distance;
+        EdgeEnergyConsumption energy_consumption;
     } data;
 
     QueryEdge() : source(SPECIAL_NODEID), target(SPECIAL_NODEID) {}
@@ -72,7 +75,7 @@ struct QueryEdge
                 data.weight == right.data.weight && data.duration == right.data.duration &&
                 data.shortcut == right.data.shortcut && data.forward == right.data.forward &&
                 data.backward == right.data.backward && data.turn_id == right.data.turn_id &&
-                data.distance == right.data.distance);
+                data.distance == right.data.distance && data.energy_consumption == right.data.energy_consumption);
     }
 };
 } // namespace osrm::contractor

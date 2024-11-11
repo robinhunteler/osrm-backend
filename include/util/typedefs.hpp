@@ -57,6 +57,9 @@ struct edge_duration
 struct edge_distance
 {
 };
+struct edge_energy_consumption
+{
+};
 struct segment_weight
 {
 };
@@ -102,6 +105,7 @@ using PackedGeometryID = std::uint32_t;
 using EdgeWeight = osrm::Alias<std::int32_t, tag::edge_weight>;
 using EdgeDuration = osrm::Alias<std::int32_t, tag::edge_duration>;
 using EdgeDistance = osrm::Alias<float, tag::edge_distance>;
+using EdgeEnergyConsumption = osrm::Alias<float, tag::edge_energy_consumption>;
 using SegmentWeight = osrm::Alias<std::uint32_t, tag::segment_weight>;
 using SegmentDuration = osrm::Alias<std::uint32_t, tag::segment_duration>;
 using TurnPenalty = osrm::Alias<std::int16_t, tag::turn_penalty>; // turn penalty in 100ms units
@@ -142,6 +146,8 @@ static const EdgeDuration INVALID_EDGE_DURATION =
     EdgeDuration{std::numeric_limits<EdgeDuration::value_type>::max()};
 static const EdgeDistance INVALID_EDGE_DISTANCE =
     EdgeDistance{std::numeric_limits<EdgeDistance::value_type>::max()};
+static const EdgeEnergyConsumption INVALID_EDGE_ENERGY_CONSUMPTION =
+    EdgeEnergyConsumption{std::numeric_limits<EdgeEnergyConsumption::value_type>::max()};
 static const TurnPenalty INVALID_TURN_PENALTY =
     TurnPenalty{std::numeric_limits<TurnPenalty::value_type>::max()};
 static const EdgeDistance INVALID_FALLBACK_SPEED =
@@ -153,6 +159,8 @@ static const EdgeDuration MAXIMAL_EDGE_DURATION =
     EdgeDuration{std::numeric_limits<EdgeDuration::value_type>::max()};
 static const EdgeDistance MAXIMAL_EDGE_DISTANCE =
     EdgeDistance{std::numeric_limits<EdgeDistance::value_type>::max()};
+static const EdgeEnergyConsumption MAXIMAL_EDGE_ENERGY_CONSUMPTION =
+    EdgeEnergyConsumption{std::numeric_limits<EdgeEnergyConsumption::value_type>::max()};
 static const TurnPenalty MAXIMAL_TURN_PENALTY =
     TurnPenalty{std::numeric_limits<TurnPenalty::value_type>::max()};
 

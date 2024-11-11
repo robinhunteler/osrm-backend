@@ -129,7 +129,7 @@ void insertSourceInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         {phantom_node.forward_segment_id.id,
                          EdgeDuration{0} - phantom_node.GetForwardDuration(),
                          EdgeDistance{0} - phantom_node.GetForwardDistance(),
-                         EdgeDistance{0} - phantom_node.GetForwardEnergyConsumption()});
+                         EdgeEnergyConsumption{0} - phantom_node.GetForwardEnergyConsumption()});
         }
         if (phantom_node.IsValidReverseSource())
         {
@@ -138,7 +138,7 @@ void insertSourceInHeap(ManyToManyQueryHeap &heap, const PhantomNodeCandidates &
                         {phantom_node.reverse_segment_id.id,
                          EdgeDuration{0} - phantom_node.GetReverseDuration(),
                          EdgeDistance{0} - phantom_node.GetReverseDistance(),
-                         EdgeDistance{0} - phantom_node.GetReverseEnergyConsumption()});
+                         EdgeEnergyConsumption{0} - phantom_node.GetReverseEnergyConsumption()});
         }
     }
 }

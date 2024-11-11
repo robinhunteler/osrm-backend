@@ -45,7 +45,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  osrm::engine::api::ResultT &response) const
@@ -63,7 +63,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  flatbuffers::FlatBufferBuilder &fb_result) const
@@ -177,7 +177,7 @@ class TableAPI final : public BaseAPI
     }
 
     virtual void
-    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>> &tables,
+    MakeResponse(const std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>> &tables,
                  const std::vector<PhantomNodeCandidates> &candidates,
                  const std::vector<TableCellRef> &fallback_speed_cells,
                  util::json::Object &response) const
@@ -331,16 +331,17 @@ class TableAPI final : public BaseAPI
 
     virtual flatbuffers::Offset<flatbuffers::Vector<float>>
     MakeEnergyConsumptionTable(flatbuffers::FlatBufferBuilder &builder,
-                      const std::vector<EdgeDistance> &values) const
+                      const std::vector<EdgeEnergyConsumption> &values) const
     {
         std::vector<float> duration_table;
         duration_table.resize(values.size());
         std::transform(values.begin(),
                        values.end(),
                        duration_table.begin(),
-                       [](const EdgeDistance energy_consumption)
+                       [](const EdgeEnergyConsumption energy_consumption)
                        {
-                           if (energy_consumption == INVALID_EDGE_DISTANCE)
+                            // TODO Mathijs: Add energy consumption logic here.
+                           if (energy_consumption == INVALID_EDGE_ENERGY_CONSUMPTION)
                            {
                                return 0.;
                            }
@@ -454,7 +455,7 @@ class TableAPI final : public BaseAPI
     }
 
 
-    virtual util::json::Array MakeEnergyConsumptionTable(const std::vector<EdgeDistance> &values,
+    virtual util::json::Array MakeEnergyConsumptionTable(const std::vector<EdgeEnergyConsumption> &values,
                                                 std::size_t number_of_rows,
                                                 std::size_t number_of_columns) const
     {
@@ -468,15 +469,15 @@ class TableAPI final : public BaseAPI
             std::transform(row_begin_iterator,
                            row_end_iterator,
                            json_row.values.begin(),
-                           [](const EdgeDistance distance)
+                           [](const EdgeEnergyConsumption energy_consumption)
                            {
-                               if (distance == INVALID_EDGE_DISTANCE)
+                               if (energy_consumption == INVALID_EDGE_ENERGY_CONSUMPTION)
                                {
                                    return util::json::Value(util::json::Null());
                                }
                                // round to single decimal place
                                return util::json::Value(util::json::Number(
-                                   std::round(from_alias<double>(distance) * 10) / 10.));
+                                   std::round(from_alias<double>(energy_consumption) * 10) / 10.));
                            });
             json_table.values.push_back(util::json::Value{json_row});
         }

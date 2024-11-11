@@ -7,7 +7,7 @@ sudo cmake --build . --target install
 cd ..
 
 # download
-wget http://download.geofabrik.de/europe/germany/bremen-latest.osm.pbf
+# wget http://download.geofabrik.de/europe/germany/bremen-latest.osm.pbf
 
 # create osrm data
 osrm-extract -p profiles/car.lua bremen-latest.osm.pbf || echo "osrm-extract failed"

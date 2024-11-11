@@ -76,6 +76,7 @@ auto LoadAndUpdateEdgeExpandedGraph(const CustomizationConfig &config,
                                     std::vector<EdgeWeight> &node_weights,
                                     std::vector<EdgeDuration> &node_durations,
                                     std::vector<EdgeDistance> &node_distances,
+                                    std::vector<EdgeEnergyConsumption> &node_energy_consumptions,
                                     std::uint32_t &connectivity_checksum)
 {
     updater::Updater updater(config.updater_config);
@@ -128,9 +129,10 @@ int Customizer::Run(const CustomizationConfig &config)
     std::vector<EdgeWeight> node_weights;
     std::vector<EdgeDuration> node_durations; // TODO: remove when durations are optional
     std::vector<EdgeDistance> node_distances; // TODO: remove when distances are optional
+    std::vector<EdgeEnergyConsumption> node_energy_consumptions; // TODO: remove when energy consumptions are optional
     std::uint32_t connectivity_checksum = 0;
     auto graph = LoadAndUpdateEdgeExpandedGraph(
-        config, mlp, node_weights, node_durations, node_distances, connectivity_checksum);
+        config, mlp, node_weights, node_durations, node_distances, node_energy_consumptions, connectivity_checksum);
     BOOST_ASSERT(graph.GetNumberOfNodes() == node_weights.size());
     std::for_each(
         node_weights.begin(), node_weights.end(), [](auto &w) { w &= EdgeWeight{0x7fffffff}; });
@@ -173,7 +175,8 @@ int Customizer::Run(const CustomizationConfig &config)
     MultiLevelEdgeBasedGraph shaved_graph{std::move(graph),
                                           std::move(node_weights),
                                           std::move(node_durations),
-                                          std::move(node_distances)};
+                                          std::move(node_distances),
+                                          std::move(node_energy_consumptions)};
     customizer::files::writeGraph(
         config.GetPath(".osrm.mldgr"), shaved_graph, connectivity_checksum);
     TIMER_STOP(writing_graph);

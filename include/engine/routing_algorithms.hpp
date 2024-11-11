@@ -30,7 +30,7 @@ class RoutingAlgorithmsInterface
     virtual InternalRouteResult
     DirectShortestPathSearch(const PhantomEndpointCandidates &endpoint_candidates) const = 0;
 
-    virtual std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+    virtual std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
     ManyToManySearch(const std::vector<PhantomNodeCandidates> &candidates_list,
                      const std::vector<std::size_t> &source_indices,
                      const std::vector<std::size_t> &target_indices,
@@ -83,7 +83,7 @@ template <typename Algorithm> class RoutingAlgorithms final : public RoutingAlgo
     InternalRouteResult DirectShortestPathSearch(
         const PhantomEndpointCandidates &endpoint_candidates) const final override;
 
-    std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+    std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
     ManyToManySearch(const std::vector<PhantomNodeCandidates> &candidates_list,
                      const std::vector<std::size_t> &source_indices,
                      const std::vector<std::size_t> &target_indices,
@@ -191,7 +191,7 @@ inline routing_algorithms::SubMatchingList RoutingAlgorithms<Algorithm>::MapMatc
 }
 
 template <typename Algorithm>
-std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeDistance>>
+std::tuple<std::vector<EdgeDuration>, std::vector<EdgeDistance>, std::vector<EdgeEnergyConsumption>>
 RoutingAlgorithms<Algorithm>::ManyToManySearch(
     const std::vector<PhantomNodeCandidates> &candidates_list,
     const std::vector<std::size_t> &_source_indices,

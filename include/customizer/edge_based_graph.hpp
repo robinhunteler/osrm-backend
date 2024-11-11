@@ -57,9 +57,10 @@ class MultiLevelGraph : public partitioner::MultiLevelGraph<EdgeDataT, Ownership
     MultiLevelGraph(PartitionerGraphT &&graph,
                     Vector<EdgeWeight> node_weights_,
                     Vector<EdgeDuration> node_durations_,
-                    Vector<EdgeDistance> node_distances_)
+                    Vector<EdgeDistance> node_distances_,
+                    Vector<EdgeEnergyConsumption> node_energy_consumptions_)
         : node_weights(std::move(node_weights_)), node_durations(std::move(node_durations_)),
-          node_distances(std::move(node_distances_))
+          node_distances(std::move(node_distances_)), node_energy_consumptions(std::move(node_energy_consumptions_))
     {
         util::ViewOrVector<PartitionerGraphT::EdgeArrayEntry, storage::Ownership::Container>
             original_edge_array;
@@ -84,11 +85,12 @@ class MultiLevelGraph : public partitioner::MultiLevelGraph<EdgeDataT, Ownership
                     Vector<EdgeWeight> node_weights_,
                     Vector<EdgeDuration> node_durations_,
                     Vector<EdgeDistance> node_distances_,
+                    Vector<EdgeEnergyConsumption> node_energy_consumptions_,
                     Vector<bool> is_forward_edge_,
                     Vector<bool> is_backward_edge_)
         : SuperT(std::move(node_array_), std::move(edge_array_), std::move(node_to_edge_offset_)),
           node_weights(std::move(node_weights_)), node_durations(std::move(node_durations_)),
-          node_distances(std::move(node_distances_)), is_forward_edge(is_forward_edge_),
+          node_distances(std::move(node_distances_)), node_energy_consumptions(std::move(node_energy_consumptions_)), is_forward_edge(is_forward_edge_),
           is_backward_edge(is_backward_edge_)
     {
     }
@@ -98,6 +100,8 @@ class MultiLevelGraph : public partitioner::MultiLevelGraph<EdgeDataT, Ownership
     EdgeDuration GetNodeDuration(NodeID node) const { return node_durations[node]; }
 
     EdgeDistance GetNodeDistance(NodeID node) const { return node_distances[node]; }
+
+    EdgeEnergyConsumption GetNodeEnergyConsumption(NodeID node) const { return node_energy_consumptions[node]; }
 
     bool IsForwardEdge(EdgeID edge) const { return is_forward_edge[edge]; }
 
@@ -116,6 +120,7 @@ class MultiLevelGraph : public partitioner::MultiLevelGraph<EdgeDataT, Ownership
     Vector<EdgeWeight> node_weights;
     Vector<EdgeDuration> node_durations;
     Vector<EdgeDistance> node_distances;
+    Vector<EdgeEnergyConsumption> node_energy_consumptions;
     Vector<bool> is_forward_edge;
     Vector<bool> is_backward_edge;
 };

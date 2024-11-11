@@ -428,6 +428,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                                     {0}, // weight
                                     {0}, // duration
                                     {0}, // distance
+                                    {0}, // energy consumption
                                     {},  // geometry id
                                     static_cast<AnnotationID>(annotation_data_id),
                                     {true,
@@ -463,6 +464,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                                     {0}, // weight
                                     {0}, // duration
                                     {0}, // distance
+                                    {0}, // energy consumption
                                     {},  // geometry id
                                     static_cast<AnnotationID>(annotation_data_id),
                                     {false,

@@ -52,7 +52,7 @@ struct PhantomNode
           forward_distance_offset{0}, reverse_distance_offset{0},
           forward_duration(MAXIMAL_EDGE_DURATION), reverse_duration(MAXIMAL_EDGE_DURATION),
           forward_duration_offset{0}, reverse_duration_offset{0},
-          forward_energy_consumption(INVALID_EDGE_DISTANCE), reverse_energy_consumption(INVALID_EDGE_DISTANCE),
+          forward_energy_consumption(INVALID_EDGE_ENERGY_CONSUMPTION), reverse_energy_consumption(INVALID_EDGE_ENERGY_CONSUMPTION),
           forward_energy_consumption_offset{0}, reverse_energy_consumption_offset{0},
           component({INVALID_COMPONENTID, 0}),
           fwd_segment_position(0), is_valid_forward_source{false}, is_valid_forward_target{false},
@@ -109,13 +109,13 @@ struct PhantomNode
         return reverse_distance + reverse_distance_offset;
     }
 
-    EdgeDistance GetForwardEnergyConsumption() const
+    EdgeEnergyConsumption GetForwardEnergyConsumption() const
     {
         BOOST_ASSERT(forward_segment_id.enabled);
         return forward_energy_consumption + forward_energy_consumption_offset;
     }
 
-    EdgeDistance GetReverseEnergyConsumption() const
+    EdgeEnergyConsumption GetReverseEnergyConsumption() const
     {
         BOOST_ASSERT(reverse_segment_id.enabled);
         return reverse_energy_consumption + reverse_energy_consumption;
@@ -134,6 +134,8 @@ struct PhantomNode
                 (reverse_duration != MAXIMAL_EDGE_DURATION)) &&
                ((forward_distance != INVALID_EDGE_DISTANCE) ||
                 (reverse_distance != INVALID_EDGE_DISTANCE)) &&
+               ((forward_energy_consumption != INVALID_EDGE_ENERGY_CONSUMPTION) ||
+                (reverse_energy_consumption != INVALID_EDGE_ENERGY_CONSUMPTION)) &&
                (component.id != INVALID_COMPONENTID);
     }
 
@@ -184,10 +186,10 @@ struct PhantomNode
                          EdgeDuration reverse_duration,
                          EdgeDuration forward_duration_offset,
                          EdgeDuration reverse_duration_offset,
-                         EdgeDistance forward_energy_consumption,
-                         EdgeDistance reverse_energy_consumption,
-                         EdgeDistance forward_energy_consumption_offset,
-                         EdgeDistance reverse_energy_consumption_offset,
+                         EdgeEnergyConsumption forward_energy_consumption,
+                         EdgeEnergyConsumption reverse_energy_consumption,
+                         EdgeEnergyConsumption forward_energy_consumption_offset,
+                         EdgeEnergyConsumption reverse_energy_consumption_offset,
                          bool is_valid_forward_source,
                          bool is_valid_forward_target,
                          bool is_valid_reverse_source,
@@ -228,10 +230,10 @@ struct PhantomNode
     EdgeDuration reverse_duration;
     EdgeDuration forward_duration_offset; // TODO: try to remove -> requires path unpacking changes
     EdgeDuration reverse_duration_offset; // TODO: try to remove -> requires path unpacking changes
-    EdgeDistance forward_energy_consumption;
-    EdgeDistance reverse_energy_consumption;
-    EdgeDistance forward_energy_consumption_offset;
-    EdgeDistance reverse_energy_consumption_offset;
+    EdgeEnergyConsumption forward_energy_consumption;
+    EdgeEnergyConsumption reverse_energy_consumption;
+    EdgeEnergyConsumption forward_energy_consumption_offset;
+    EdgeEnergyConsumption reverse_energy_consumption_offset;
     ComponentID component;
 
     util::Coordinate location; // this is the coordinate of x

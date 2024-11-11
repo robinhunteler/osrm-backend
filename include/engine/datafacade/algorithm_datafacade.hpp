@@ -84,6 +84,8 @@ template <> class AlgorithmDataFacade<MLD>
 
     virtual EdgeDistance GetNodeDistance(const NodeID edge_based_node_id) const = 0;
 
+    virtual EdgeEnergyConsumption GetNodeEnergyConsumption(const NodeID edge_based_node_id) const = 0;
+
     virtual bool IsForwardEdge(EdgeID edge_based_edge_id) const = 0;
 
     virtual bool IsBackwardEdge(EdgeID edge_based_edge_id) const = 0;

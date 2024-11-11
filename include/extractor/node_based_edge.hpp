@@ -96,6 +96,7 @@ struct NodeBasedEdge
                   EdgeWeight weight,
                   EdgeDuration duration,
                   EdgeDistance distance,
+                  EdgeEnergyConsumption energy_consumption,
                   GeometryID geometry_id,
                   AnnotationID annotation_data,
                   NodeBasedEdgeClassification flags);
@@ -107,6 +108,7 @@ struct NodeBasedEdge
     EdgeWeight weight;                 // 32 4
     EdgeDuration duration;             // 32 4
     EdgeDistance distance;             // 32 4
+    EdgeEnergyConsumption energy_consumption; // 32 4
     GeometryID geometry_id;            // 32 4
     AnnotationID annotation_data;      // 32 4
     NodeBasedEdgeClassification flags; // 32 4
@@ -121,6 +123,7 @@ struct NodeBasedEdgeWithOSM : NodeBasedEdge
                          EdgeWeight weight,
                          EdgeDuration duration,
                          EdgeDistance distance,
+                         EdgeEnergyConsumption energy_consumption,
                          GeometryID geometry_id,
                          AnnotationID annotation_data,
                          NodeBasedEdgeClassification flags);
@@ -149,11 +152,12 @@ inline NodeBasedEdge::NodeBasedEdge(NodeID source,
                                     EdgeWeight weight,
                                     EdgeDuration duration,
                                     EdgeDistance distance,
+                                    EdgeEnergyConsumption energy_consumption,
                                     GeometryID geometry_id,
                                     AnnotationID annotation_data,
                                     NodeBasedEdgeClassification flags)
     : source(source), target(target), weight(weight), duration(duration), distance(distance),
-      geometry_id(geometry_id), annotation_data(annotation_data), flags(flags)
+      energy_consumption(energy_consumption), geometry_id(geometry_id), annotation_data(annotation_data), flags(flags)
 {
 }
 
@@ -180,6 +184,7 @@ inline NodeBasedEdgeWithOSM::NodeBasedEdgeWithOSM(OSMNodeID source,
                                                   EdgeWeight weight,
                                                   EdgeDuration duration,
                                                   EdgeDistance distance,
+                                                  EdgeEnergyConsumption energy_consumption,
                                                   GeometryID geometry_id,
                                                   AnnotationID annotation_data,
                                                   NodeBasedEdgeClassification flags)
@@ -188,6 +193,7 @@ inline NodeBasedEdgeWithOSM::NodeBasedEdgeWithOSM(OSMNodeID source,
                     weight,
                     duration,
                     distance,
+                    energy_consumption,
                     geometry_id,
                     annotation_data,
                     flags),
@@ -200,7 +206,7 @@ inline NodeBasedEdgeWithOSM::NodeBasedEdgeWithOSM()
 {
 }
 
-static_assert(sizeof(extractor::NodeBasedEdge) == 32,
+static_assert(sizeof(extractor::NodeBasedEdge) == 36,
               "Size of extractor::NodeBasedEdge type is "
               "bigger than expected. This will influence "
               "memory consumption.");

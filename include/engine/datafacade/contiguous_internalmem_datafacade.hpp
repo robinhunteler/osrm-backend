@@ -714,6 +714,11 @@ template <> class ContiguousInternalMemoryAlgorithmDataFacade<MLD> : public Algo
         return query_graph.GetNodeDistance(edge_based_node_id);
     }
 
+    EdgeEnergyConsumption GetNodeEnergyConsumption(const NodeID edge_based_node_id) const override final
+    {
+        return query_graph.GetNodeEnergyConsumption(edge_based_node_id);
+    }
+
     bool IsForwardEdge(const NodeID edge_based_node_id) const override final
     {
         return query_graph.IsForwardEdge(edge_based_node_id);

@@ -326,6 +326,7 @@ inline auto make_multi_level_graph_view(const SharedDataIndex &index, const std:
     auto node_weights = make_vector_view<EdgeWeight>(index, name + "/node_weights");
     auto node_durations = make_vector_view<EdgeDuration>(index, name + "/node_durations");
     auto node_distances = make_vector_view<EdgeDistance>(index, name + "/node_distances");
+    auto node_energy_consumptions = make_vector_view<EdgeEnergyConsumption>(index, name + "/node_energy_consumptions");
     auto is_forward_edge = make_vector_view<bool>(index, name + "/is_forward_edge");
     auto is_backward_edge = make_vector_view<bool>(index, name + "/is_backward_edge");
 
@@ -335,6 +336,7 @@ inline auto make_multi_level_graph_view(const SharedDataIndex &index, const std:
                                                     node_weights,
                                                     node_durations,
                                                     node_distances,
+                                                    node_energy_consumptions,
                                                     is_forward_edge,
                                                     is_backward_edge);
 }
