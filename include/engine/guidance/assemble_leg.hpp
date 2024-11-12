@@ -171,16 +171,16 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
 {
     auto distance = 0.;
     // TODO MATHIJS
-    auto energy_consumption = 0.;
+    // auto energy_consumption = 0.;
     auto prev_coordinate = source_node.location;
     for (const auto &path_point : route_data)
     {
         auto coordinate = facade.GetCoordinateOfNode(path_point.turn_via_node);
         auto delta_distance = util::coordinate_calculation::greatCircleDistance(prev_coordinate, coordinate);
         distance += delta_distance;
-        if (path_point.duration_until_turn != to_alias<EdgeDuration>(0)) {
-            energy_consumption += util::coordinate_calculation::GetWattHour(delta_distance, from_alias<float>(path_point.duration_until_turn));
-        }
+        // if (path_point.duration_until_turn != to_alias<EdgeDuration>(0)) {
+        //     energy_consumption += util::coordinate_calculation::GetWattHour(delta_distance, from_alias<float>(path_point.duration_until_turn));
+        // }
         prev_coordinate = coordinate;
     }
     distance +=
@@ -202,6 +202,12 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
                                   0,
                                   [](const double sum, const PathData &data)
                                   { return sum + from_alias<double>(data.weight_until_turn); });
+
+    auto energy_consumption = std::accumulate(route_data.begin(),
+                                    route_data.end(),
+                                    0,
+                                    [](const double sum, const PathData &data)
+                                    { return sum + from_alias<double>(data.energy_consumption_until_turn); });
 
     //                 s
     //                 |
@@ -242,7 +248,7 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
     return RouteLeg{std::round(distance * 10.) / 10.,
                     duration / 10.,
                     weight / facade.GetWeightMultiplier(),
-                    std::round(energy_consumption * 10. / 10.),
+                    std::round(energy_consumption * 10.) / 10.,
                     "",
                     {}};
 }

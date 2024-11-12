@@ -159,6 +159,7 @@ template <class Edge, typename GraphT> inline std::vector<Edge> toEdges(GraphT g
                 new_edge.data.weight = data.weight;
                 new_edge.data.duration = from_alias<EdgeDuration::value_type>(data.duration);
                 new_edge.data.distance = data.distance;
+                new_edge.data.energy_consumption = to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(data.distance), from_alias<float>(data.duration)));
                 new_edge.data.shortcut = data.shortcut;
                 new_edge.data.turn_id = data.id;
                 BOOST_ASSERT_MSG(new_edge.data.turn_id != INT_MAX, // 2^31

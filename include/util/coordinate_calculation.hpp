@@ -11,6 +11,7 @@
 #include <optional>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace osrm::util::coordinate_calculation
 {
@@ -47,7 +48,7 @@ inline double GetWattHour(const float distance, const float duration) {
 
     // Energy consumption.
     auto energy_consumption = force * distance;
-
+    std::cout << energy_consumption / 3600.0 << "\n";
     return energy_consumption / 3600.0;
 }
 

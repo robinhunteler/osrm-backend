@@ -2,6 +2,7 @@
 #define QUERYEDGE_HPP
 
 #include "util/typedefs.hpp"
+#include "util/coordinate_calculation.hpp"
 
 #include <tuple>
 
@@ -25,10 +26,10 @@ struct QueryEdge
                  const EdgeWeight weight,
                  const EdgeDuration duration,
                  const EdgeDistance distance,
-                 const EdgeEnergyConsumption energy_consumption,
                  const bool forward,
                  const bool backward)
             : turn_id(turn_id), shortcut(shortcut), weight(weight), duration(duration),
+              energy_consumption(to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(distance), from_alias<float>(duration)))),
               forward(forward), backward(backward), distance(distance)
         {
         }

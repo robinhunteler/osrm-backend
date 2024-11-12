@@ -2,6 +2,7 @@
 #define OSRM_CONTRACTOR_CONTRACTOR_GRAPH_HPP_
 
 #include "util/dynamic_graph.hpp"
+#include "util/coordinate_calculation.hpp"
 #include <algorithm>
 
 namespace osrm::contractor
@@ -10,7 +11,7 @@ namespace osrm::contractor
 struct ContractorEdgeData
 {
     ContractorEdgeData()
-        : weight{0}, duration{0}, distance{0}, id(0), originalEdges(0), shortcut(0), forward(0),
+        : weight{0}, duration{0}, distance{0}, energy_consumption{0}, id(0), originalEdges(0), shortcut(0), forward(0),
           backward(0)
     {
     }
@@ -22,14 +23,16 @@ struct ContractorEdgeData
                        bool shortcut,
                        bool forward,
                        bool backward)
-        : weight(weight), duration(duration), distance(distance), id(id),
-          originalEdges(std::min((1u << 29) - 1u, original_edges)), shortcut(shortcut),
+        : weight(weight), duration(duration), distance(distance), 
+          energy_consumption(to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(distance), from_alias<float>(duration)))),
+          id(id), originalEdges(std::min((1u << 29) - 1u, original_edges)), shortcut(shortcut),
           forward(forward), backward(backward)
     {
     }
     EdgeWeight weight;
     EdgeDuration duration;
     EdgeDistance distance;
+    EdgeEnergyConsumption energy_consumption;
     unsigned id;
     unsigned originalEdges : 29;
     bool shortcut : 1;

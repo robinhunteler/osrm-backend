@@ -19,6 +19,7 @@
 #include <iterator>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 namespace osrm::engine
 {
@@ -404,6 +405,8 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
 
         BOOST_ASSERT(data.fwd_segment_position <
                      std::distance(forward_durations.begin(), forward_durations.end()));
+
+        std::cout << "TEST \n";
 
         EdgeWeight forward_weight =
             alias_cast<EdgeWeight>(forward_weights[data.fwd_segment_position]);
