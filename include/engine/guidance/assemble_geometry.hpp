@@ -103,6 +103,7 @@ inline LegGeometry assembleGeometry(const datafacade::BaseDataFacade &facade,
                     10.,
                 from_alias<double>(path_point.weight_until_turn - path_point.weight_of_turn) /
                     facade.GetWeightMultiplier(),
+                from_alias<double>(path_point.energy_consumption_until_turn - path_point.energy_consumption_of_turn),
                 path_point.datasource_id});
             geometry.locations.push_back(coordinate);
             geometry.node_ids.push_back(node_id);

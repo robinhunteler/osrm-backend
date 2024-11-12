@@ -827,6 +827,7 @@ inline ::flatbuffers::Offset<Step> CreateStep(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float distance = 0.0f,
     float duration = 0.0f,
+    float energy_consumption = 0.0f,
     ::flatbuffers::Offset<::flatbuffers::String> polyline = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<const osrm::engine::api::fbresult::Position *>> coordinates = 0,
     float weight = 0.0f,
@@ -857,6 +858,7 @@ inline ::flatbuffers::Offset<Step> CreateStep(
   builder_.add_polyline(polyline);
   builder_.add_duration(duration);
   builder_.add_distance(distance);
+  builder_.add_energy_consumption(energy_consumption);
   builder_.add_driving_side(driving_side);
   return builder_.Finish();
 }
@@ -865,6 +867,7 @@ inline ::flatbuffers::Offset<Step> CreateStepDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     float distance = 0.0f,
     float duration = 0.0f,
+    float energy_consumption = 0.0f,
     const char *polyline = nullptr,
     const std::vector<osrm::engine::api::fbresult::Position> *coordinates = nullptr,
     float weight = 0.0f,
@@ -894,6 +897,7 @@ inline ::flatbuffers::Offset<Step> CreateStepDirect(
       _fbb,
       distance,
       duration,
+      energy_consumption,
       polyline__,
       coordinates__,
       weight,

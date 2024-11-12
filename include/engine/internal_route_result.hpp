@@ -149,6 +149,11 @@ inline InternalRouteResult CollapseInternalRouteResult(const InternalRouteResult
                     leggy_result.source_traversed_in_reverse[i]
                         ? leggy_result.leg_endpoints[i].source_phantom.reverse_duration
                         : leggy_result.leg_endpoints[i].source_phantom.forward_duration;
+
+                last_segment[old_size].energy_consumption_until_turn +=
+                    leggy_result.source_traversed_in_reverse[i]
+                        ? leggy_result.leg_endpoints[i].source_phantom.reverse_energy_consumption
+                        : leggy_result.leg_endpoints[i].source_phantom.forward_energy_consumption;
             }
         }
     }

@@ -275,6 +275,7 @@ void annotatePath(const FacadeT &facade,
         unpacked_path.back().weight_until_turn += alias_cast<EdgeWeight>(turn_weight);
         unpacked_path.back().weight_of_turn = alias_cast<EdgeWeight>(turn_weight);
         unpacked_path.back().turn_edge = turn_id;
+        // TODO MATHIJS SOMETHING WITH TURNS, BREAKING AND SO ON.
     }
 
     std::size_t start_index = 0, end_index = 0;
@@ -331,6 +332,10 @@ void annotatePath(const FacadeT &facade,
         const auto source_duration = start_traversed_in_reverse
                                          ? endpoints.source_phantom.reverse_duration
                                          : endpoints.source_phantom.forward_duration;
+
+        const auto source_energy_consumption = start_traversed_in_reverse
+                                         ? endpoints.source_phantom.reverse_energy_consumption
+                                         : endpoints.source_phantom.forward_energy_consumption;
         // The above code will create segments for (v, w), (w,x), (x, y) and (y, Z).
         // However the first segment duration needs to be adjusted to the fact that the source
         // phantom is in the middle of the segment. We do this by subtracting v--s from the
@@ -348,6 +353,8 @@ void annotatePath(const FacadeT &facade,
             std::max(unpacked_path.front().weight_until_turn - source_weight, {0});
         unpacked_path.front().duration_until_turn =
             std::max(unpacked_path.front().duration_until_turn - source_duration, {0});
+        unpacked_path.front().energy_consumption_until_turn =
+            std::max(unpacked_path.front().energy_consumption_until_turn - source_energy_consumption, {0});
     }
 }
 

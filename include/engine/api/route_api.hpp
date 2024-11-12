@@ -643,6 +643,7 @@ class RouteAPI : public BaseAPI
         fbresult::StepBuilder stepBuilder(builder);
         stepBuilder.add_duration(step.duration);
         stepBuilder.add_distance(step.distance);
+        stepBuilder.add_energy_consumption(step.energy_consumption);
         stepBuilder.add_weight(step.weight);
         stepBuilder.add_name(name_string);
         stepBuilder.add_mode(mode_string);

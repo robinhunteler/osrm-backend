@@ -176,7 +176,7 @@ util::json::Object makeRouteStep(guidance::RouteStep step, util::json::Value geo
     route_step.values.emplace("distance", std::round(step.distance * 10) / 10.);
     route_step.values.emplace("duration", step.duration);
     route_step.values.emplace("weight", step.weight);
-    route_step.values.emplace("energy consumption", step.energy_consumption);
+    route_step.values.emplace("energy_consumption", step.energy_consumption);
     route_step.values.emplace("name", step.name);
 
     if (!step.ref.empty())
