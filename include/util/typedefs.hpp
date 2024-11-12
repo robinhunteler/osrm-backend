@@ -66,6 +66,9 @@ struct segment_weight
 struct segment_duration
 {
 };
+struct segment_energy_consumption
+{
+};
 struct turn_penalty
 {
 };
@@ -108,6 +111,7 @@ using EdgeDistance = osrm::Alias<float, tag::edge_distance>;
 using EdgeEnergyConsumption = osrm::Alias<float, tag::edge_energy_consumption>;
 using SegmentWeight = osrm::Alias<std::uint32_t, tag::segment_weight>;
 using SegmentDuration = osrm::Alias<std::uint32_t, tag::segment_duration>;
+using SegmentEnergyConsumption = osrm::Alias<float, tag::segment_energy_consumption>;
 using TurnPenalty = osrm::Alias<std::int16_t, tag::turn_penalty>; // turn penalty in 100ms units
 
 static const std::size_t INVALID_INDEX = std::numeric_limits<std::size_t>::max();

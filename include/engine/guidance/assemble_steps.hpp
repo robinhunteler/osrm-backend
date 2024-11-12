@@ -44,12 +44,15 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
 {
     const double weight_multiplier = facade.GetWeightMultiplier();
 
-    const double constexpr ZERO_DURATION = 0., ZERO_DISTANCE = 0., ZERO_WEIGHT = 0;
+    const double constexpr ZERO_DURATION = 0., ZERO_DISTANCE = 0., ZERO_WEIGHT = 0, ZERO_ENERGY_CONSUMPTION = 0.;
     const constexpr char *NO_ROTARY_NAME = "";
     const EdgeWeight source_weight =
         source_traversed_in_reverse ? source_node.reverse_weight : source_node.forward_weight;
     const EdgeDuration source_duration =
         source_traversed_in_reverse ? source_node.reverse_duration : source_node.forward_duration;
+    const EdgeEnergyConsumption source_energy_consumption = 
+        source_traversed_in_reverse ? source_node.reverse_energy_consumption : source_node.forward_energy_consumption;
+
     const auto source_node_id = source_traversed_in_reverse ? source_node.reverse_segment_id.id
                                                             : source_node.forward_segment_id.id;
     const auto source_name_id = facade.GetNameIndex(source_node_id);
@@ -61,6 +64,9 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
         target_traversed_in_reverse ? target_node.reverse_duration : target_node.forward_duration;
     const EdgeWeight target_weight =
         target_traversed_in_reverse ? target_node.reverse_weight : target_node.forward_weight;
+    const EdgeEnergyConsumption target_energy_consumption = 
+        target_traversed_in_reverse ? target_node.reverse_energy_consumption : target_node.forward_energy_consumption;
+
     const auto target_node_id = target_traversed_in_reverse ? target_node.reverse_segment_id.id
                                                             : target_node.forward_segment_id.id;
     const auto target_name_id = facade.GetNameIndex(target_node_id);
@@ -101,6 +107,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
         // initial start of a route
         EdgeDuration segment_duration = {0};
         EdgeWeight segment_weight = {0};
+        EdgeEnergyConsumption segment_energy_consumption = {0};
 
         // some name changes are not announced in our processing. For these, we have to keep the
         // first name on the segment
@@ -110,6 +117,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
             const auto &path_point = leg_data[leg_data_index];
             segment_duration += path_point.duration_until_turn;
             segment_weight += path_point.weight_until_turn;
+            segment_energy_consumption += path_point.energy_consumption_until_turn;
 
             // all changes to this check have to be matched with assemble_geometry
             const auto turn_instruction =
@@ -146,7 +154,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                           from_alias<double>(segment_duration) / 10.,
                                           distance,
                                           from_alias<double>(segment_weight) / weight_multiplier,
-                                          distance * 2, // NEED TO ADJUST THIS
+                                          from_alias<double>(segment_energy_consumption), // TODO MATHIJS
                                           travel_mode,
                                           maneuver,
                                           leg_geometry.FrontIndex(segment_index),
@@ -226,15 +234,18 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                             0};
                 segment_index++;
                 segment_duration = {0};
+                segment_energy_consumption = {0};
                 segment_weight = {0};
             }
         }
         const auto distance = leg_geometry.segment_distances[segment_index];
         const EdgeDuration duration = segment_duration + target_duration;
+        const EdgeEnergyConsumption energy_consumption = segment_energy_consumption + target_energy_consumption;
         const EdgeWeight weight = segment_weight + target_weight;
         // intersections contain the classes of exiting road
         intersection.classes = facade.GetClasses(facade.GetClassData(target_node_id));
         BOOST_ASSERT(duration >= EdgeDuration{0});
+        BOOST_ASSERT(energy_consumption >= EdgeEnergyConsumption{0});
         steps.push_back(RouteStep{leg_data[leg_data.size() - 1].from_edge_based_node,
                                   step_name_id,
                                   is_segregated,
@@ -248,7 +259,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   from_alias<double>(duration) / 10.,
                                   distance,
                                   from_alias<double>(weight) / weight_multiplier,
-                                  2 * distance, // NEED TO ADJUST THIS
+                                  from_alias<double>(energy_consumption), // TODO MATHIJS
                                   target_mode,
                                   maneuver,
                                   leg_geometry.FrontIndex(segment_index),
@@ -281,6 +292,9 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
         BOOST_ASSERT(target_duration >= source_duration || weight == EdgeWeight{0});
         const EdgeDuration duration =
             std::max<EdgeDuration>({0}, target_duration - source_duration);
+        BOOST_ASSERT(target_energy_consumption >= source_energy_consumption || weight == EdgeWeight{0});
+        const EdgeEnergyConsumption energy_consumption = 
+            std::max<EdgeEnergyConsumption>({0}, target_energy_consumption - source_energy_consumption);
 
         steps.push_back(RouteStep{source_node_id,
                                   source_name_id,
@@ -295,7 +309,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                                   from_alias<double>(duration) / 10.,
                                   leg_geometry.segment_distances[segment_index],
                                   from_alias<double>(weight) / weight_multiplier,
-                                  2 * leg_geometry.segment_distances[segment_index], // NEED TO ADJUST
+                                  from_alias<double>(energy_consumption), // TODO MATHIJS
                                   source_mode,
                                   maneuver,
                                   leg_geometry.FrontIndex(segment_index),
@@ -339,7 +353,7 @@ inline std::vector<RouteStep> assembleSteps(const datafacade::BaseDataFacade &fa
                               ZERO_DURATION,
                               ZERO_DISTANCE,
                               ZERO_WEIGHT,
-                              ZERO_DISTANCE, 
+                              ZERO_ENERGY_CONSUMPTION, 
                               target_mode,
                               maneuver,
                               leg_geometry.locations.size() - 1,

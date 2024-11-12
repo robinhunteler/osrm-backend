@@ -674,8 +674,8 @@ void EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(
             auto weight = edge_data1.weight + alias_cast<EdgeWeight>(weight_penalty);
             auto duration = edge_data1.duration + alias_cast<EdgeDuration>(duration_penalty);
             auto distance = edge_data1.distance;
-            // TODO MATHIJS: this is a temporary solution to get the energy consumption.
-            EdgeEnergyConsumption energy_consumption = {0};
+            // TODO MATHIJS: this is a temporary solution to get the energy consumption. Add penalties?
+            EdgeEnergyConsumption energy_consumption = edge_data1.energy_consumption;
 
             EdgeBasedEdge edge_based_edge = {edge_based_node_from,
                                              edge_based_node_to,

@@ -43,6 +43,12 @@ struct PathData
     DatasourceID datasource_id;
     // If segment precedes a turn, ID of the turn itself
     std::optional<EdgeID> turn_edge;
+    // Energy consumed on the segment until the turn is reached,
+    // including a turn if the segment precedes one. TODO MATHIJS
+    EdgeEnergyConsumption energy_consumption_until_turn;
+    // Energy consumed on the segment until the turn is reached,
+    // including a turn if the segment precedes one. TODO MATHIJS
+    EdgeEnergyConsumption energy_consumption_of_turn;
 };
 
 struct InternalRouteResult

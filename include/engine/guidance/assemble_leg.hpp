@@ -170,11 +170,17 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
                             const bool target_traversed_in_reverse)
 {
     auto distance = 0.;
+    // TODO MATHIJS
+    auto energy_consumption = 0.;
     auto prev_coordinate = source_node.location;
     for (const auto &path_point : route_data)
     {
         auto coordinate = facade.GetCoordinateOfNode(path_point.turn_via_node);
-        distance += util::coordinate_calculation::greatCircleDistance(prev_coordinate, coordinate);
+        auto delta_distance = util::coordinate_calculation::greatCircleDistance(prev_coordinate, coordinate);
+        distance += delta_distance;
+        if (path_point.duration_until_turn != to_alias<EdgeDuration>(0)) {
+            energy_consumption += util::coordinate_calculation::GetWattHour(delta_distance, from_alias<float>(path_point.duration_until_turn));
+        }
         prev_coordinate = coordinate;
     }
     distance +=
@@ -184,7 +190,8 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
         (target_traversed_in_reverse ? target_node.reverse_duration : target_node.forward_duration);
     const auto target_weight =
         (target_traversed_in_reverse ? target_node.reverse_weight : target_node.forward_weight);
-
+    const auto target_energy_consumption =
+        (target_traversed_in_reverse ? target_node.reverse_energy_consumption : target_node.forward_energy_consumption);
     auto duration = std::accumulate(route_data.begin(),
                                     route_data.end(),
                                     0,
@@ -195,9 +202,6 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
                                   0,
                                   [](const double sum, const PathData &data)
                                   { return sum + from_alias<double>(data.weight_until_turn); });
-
-    // TODO Mathijs: Add energy consumption logic here.
-    auto energy_consumption = 0.0;
 
     //                 s
     //                 |
@@ -222,6 +226,8 @@ inline RouteLeg assembleLeg(const datafacade::BaseDataFacade &facade,
 
     duration = duration + from_alias<double>(target_duration);
     weight = weight + from_alias<double>(target_weight);
+    energy_consumption = energy_consumption + from_alias<double>(target_energy_consumption);
+
     if (route_data.empty())
     {
         weight -= from_alias<double>(target_traversed_in_reverse ? source_node.reverse_weight

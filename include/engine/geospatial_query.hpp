@@ -397,7 +397,9 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
 
             auto duration = alias_cast<EdgeDuration>(forward_durations[*current]);
 
-            forward_energy_consumption_offset += to_alias<EdgeEnergyConsumption>(GetWattHour(distance, duration));
+            if (duration != to_alias<EdgeDuration>(0)) {
+                forward_energy_consumption_offset += to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(distance), from_alias<float>(duration)));
+            }
         }
 
         BOOST_ASSERT(data.fwd_segment_position <
@@ -445,8 +447,9 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
                     datafacade.GetCoordinateOfNode(*std::next(current))));
 
             auto duration = alias_cast<EdgeDuration>(reverse_durations[*current]);
-
-            reverse_energy_consumption_offset += to_alias<EdgeEnergyConsumption>(GetWattHour(distance, duration));
+            if (duration != to_alias<EdgeDuration>(0)) {
+                reverse_energy_consumption_offset += to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(distance), from_alias<float>(duration)));
+            }
         }        
 
         EdgeWeight reverse_weight = alias_cast<EdgeWeight>(
@@ -458,32 +461,34 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
                 point_on_segment,
                 datafacade.GetCoordinateOfNode(forward_geometry(data.fwd_segment_position + 1))));
         
+        // TODO MATHIJS
+        EdgeEnergyConsumption forward_energy_consumption = to_alias<EdgeEnergyConsumption>(0.0);
+        if (forward_duration != to_alias<EdgeDuration>(0)) {
+            forward_energy_consumption = 
+                to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(forward_distance), from_alias<float>(forward_duration)));
+        }
+
+        EdgeEnergyConsumption reverse_energy_consumption = to_alias<EdgeEnergyConsumption>(0.0);
+        if (reverse_duration != to_alias<EdgeDuration>(0)) {
+            reverse_energy_consumption = 
+                to_alias<EdgeEnergyConsumption>(util::coordinate_calculation::GetWattHour(from_alias<float>(reverse_distance), from_alias<float>(reverse_duration)));
+        }
+        
         ratio = std::min(1.0, std::max(0.0, ratio));
         if (data.forward_segment_id.id != SPECIAL_SEGMENTID)
         {
             forward_weight = to_alias<EdgeWeight>(from_alias<double>(forward_weight) * ratio);
             forward_duration = to_alias<EdgeDuration>(from_alias<double>(forward_duration) * ratio);
+            forward_energy_consumption =
+                to_alias<EdgeEnergyConsumption>(from_alias<double>(forward_energy_consumption) * ratio);
         }
         if (data.reverse_segment_id.id != SPECIAL_SEGMENTID)
         {
             reverse_weight -= to_alias<EdgeWeight>(from_alias<double>(reverse_weight) * ratio);
             reverse_duration -=
                 to_alias<EdgeDuration>(from_alias<double>(reverse_duration) * ratio);
-            // reverse_energy_consumption -=
-            //     to_alias<EdgeEnergyConsumption>(from_alias<double>(reverse_energy_consumption) * ratio);
-        }
-
-        // TODO MATHIJS
-        EdgeEnergyConsumption forward_energy_consumption = to_alias<EdgeEnergyConsumption>(0.0);
-        if (forward_duration != to_alias<EdgeDuration>(0)) {
-            forward_energy_consumption = 
-                to_alias<EdgeEnergyConsumption>(GetWattHour(forward_distance, forward_duration));
-        }
-
-        EdgeEnergyConsumption reverse_energy_consumption = to_alias<EdgeEnergyConsumption>(0.0);
-        if (reverse_duration != to_alias<EdgeDuration>(0)) {
-            reverse_energy_consumption = 
-                to_alias<EdgeEnergyConsumption>(GetWattHour(reverse_distance, reverse_duration));
+            reverse_energy_consumption -=
+                to_alias<EdgeEnergyConsumption>(from_alias<double>(reverse_energy_consumption) * ratio);
         }
 
         // check phantom node segments validity
@@ -528,29 +533,6 @@ template <typename RTreeT, typename DataFacadeT> class GeospatialQuery
             current_perpendicular_distance};
 
         return transformed;
-    }
-
-    EdgeEnergyConsumption GetWattHour(const EdgeDistance distance, const EdgeDuration duration) const
-    {      
-        // Rolling resistance.
-        auto mass = 2800;
-        auto gravity = 9.81;
-        auto rolling_resistance_coefficient = 0.0112; // Bad road
-
-        // Air resistance.
-        auto air_density = 1.225;
-        auto drag_coefficient = 0.35;
-        auto frontal_area = 4;
-        auto drag_constant = 0.5 * air_density * drag_coefficient * frontal_area;
-
-        // Combined force. 
-        auto speed = from_alias<double>(distance) / from_alias<double>(duration);
-        auto force = mass * gravity * rolling_resistance_coefficient + drag_constant * speed * speed;
-
-        // Energy consumption.
-        auto energy_consumption = force * from_alias<double>(distance);
-
-        return to_alias<EdgeEnergyConsumption>(energy_consumption);
     }
 
     double GetSegmentDistance(const Coordinate input_coordinate,

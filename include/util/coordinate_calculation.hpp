@@ -28,6 +28,29 @@ inline double degToRad(const double degree) { return degree * (std::numbers::pi 
 inline double radToDeg(const double radian) { return radian * (180.0 * std::numbers::inv_pi); }
 } // namespace detail
 
+// MOVE THIS FUNCTION TODO MATHIJS
+inline double GetWattHour(const float distance, const float duration) {
+    // Rolling resistance.
+    auto mass = 2800;
+    auto gravity = 9.81;
+    auto rolling_resistance_coefficient = 0.0112; // Bad road
+
+    // Air resistance.
+    auto air_density = 1.225;
+    auto drag_coefficient = 0.35;
+    auto frontal_area = 4;
+    auto drag_constant = 0.5 * air_density * drag_coefficient * frontal_area;
+
+    // Combined force. 
+    auto speed = distance / duration;
+    auto force = mass * gravity * rolling_resistance_coefficient + drag_constant * speed * speed;
+
+    // Energy consumption.
+    auto energy_consumption = force * distance;
+
+    return energy_consumption / 3600.0;
+}
+
 const constexpr static double METERS_PER_DEGREE_LAT = 110567.0;
 
 inline double metersPerLngDegree(const FixedLatitude lat)
